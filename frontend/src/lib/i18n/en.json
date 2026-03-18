@@ -153,6 +153,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "brokers": "Brokers",
+    "nominee": "Nominee",
     "assets": "Assets",
     "transactions": "Transactions",
     "fx": "FX Rates",
@@ -282,6 +283,29 @@
       "editorDesc": "Can modify transactions",
       "viewerDesc": "Read only"
     }
+  },
+  "nominee": {
+    "badge": "Nominee safeguard",
+    "title": "Nominee",
+    "subtitle": "Choose who should receive an automated email if your account stays inactive for too long.",
+    "lastActivity": "Last activity",
+    "lastEmail": "Last nominee email",
+    "loading": "Loading nominee settings...",
+    "emailLabel": "Nominee email",
+    "toggleTitle": "Enable nominee emails",
+    "toggleHint": "Turn this on only after you add the email address you want LibreFolio to notify.",
+    "thresholdLabel": "Threshold in days",
+    "thresholdHint": "Example: set {value} {unit} to email your nominee after that much inactivity.",
+    "deliveryTitle": "Delivery note",
+    "deliveryHint": "Email sending depends on your backend SMTP values in .env.",
+    "saveSuccess": "Nominee settings saved successfully.",
+    "footerNote": "This page keeps your nominee contact separate from brokers while still tied to your inactivity protection.",
+    "saveButton": "Save nominee settings",
+    "saving": "Saving...",
+    "unitDays": "Days",
+    "unitHours": "Hours",
+    "unitMinutes": "Minutes",
+    "unitSeconds": "Seconds"
   },
   "assets": {
     "title": "Assets",

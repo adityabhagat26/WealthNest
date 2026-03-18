@@ -12,6 +12,7 @@ from backend.app.db.base import (
     # Models
     User,
     UserSettings,
+    NomineeAccessToken,
     Broker,
     BrokerUserAccess,
     Asset,
@@ -36,6 +37,7 @@ __all__ = [
     # Models
     "User",
     "UserSettings",
+    "NomineeAccessToken",
     "Broker",
     "BrokerUserAccess",
     "Asset",

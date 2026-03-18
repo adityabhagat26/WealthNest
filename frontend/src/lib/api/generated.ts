@@ -40,6 +40,47 @@ type UserSettingsRead = {
      */
     ((string | null) | Array<string | null>)
     | undefined;
+  nominee_email?:
+    | /**
+     * Nominee email for inactivity alerts
+     */
+    ((string | null) | Array<string | null>)
+    | undefined;
+  nominee_enabled?: /**
+   * Whether nominee alerts are enabled
+   *
+   * @default false
+   */
+  boolean | undefined;
+  nominee_threshold_days?: /**
+   * Inactivity threshold value before alert
+   *
+   * @default 30
+   * @minimum 1
+   * @maximum 3650
+   */
+  number | undefined;
+  nominee_threshold_unit?:
+    | /**
+     * Unit for the inactivity threshold value
+     *
+     * @default "days"
+     * @enum days, hours, minutes, seconds
+     */
+    ("days" | "hours" | "minutes" | "seconds")
+    | undefined;
+  last_activity_at?:
+    | /**
+     * Last authenticated activity timestamp
+     */
+    ((string | null) | Array<string | null>)
+    | undefined;
+  nominee_last_notified_at?:
+    | /**
+     * Last nominee email notification timestamp
+     */
+    ((string | null) | Array<string | null>)
+    | undefined;
 };
 type AuthMeResponse = {
   user: AuthUserResponse;
@@ -2628,6 +2669,8 @@ type ValidationError = {
   loc: Array<(string | number) | Array<string | number>>;
   msg: string;
   type: string;
+  input?: unknown | undefined;
+  ctx?: {} | undefined;
 };
 type SystemInfoResponse = {
   app_version: string;
@@ -3057,6 +3100,36 @@ const UserSettingsRead: z.ZodType<UserSettingsRead> = z
       .union([z.string(), z.null()])
       .describe("URL to user avatar image")
       .optional(),
+    nominee_email: z
+      .union([z.string(), z.null()])
+      .describe("Nominee email for inactivity alerts")
+      .optional(),
+    nominee_enabled: z
+      .boolean()
+      .describe("Whether nominee alerts are enabled")
+      .optional()
+      .default(false),
+    nominee_threshold_days: z
+      .number()
+      .int()
+      .gte(1)
+      .lte(3650)
+      .describe("Inactivity threshold value before alert")
+      .optional()
+      .default(30),
+    nominee_threshold_unit: z
+      .enum(["days", "hours", "minutes", "seconds"])
+      .describe("Unit for the inactivity threshold value")
+      .optional()
+      .default("days"),
+    last_activity_at: z
+      .union([z.string(), z.null()])
+      .describe("Last authenticated activity timestamp")
+      .optional(),
+    nominee_last_notified_at: z
+      .union([z.string(), z.null()])
+      .describe("Last nominee email notification timestamp")
+      .optional(),
   })
   .passthrough();
 const AuthLoginResponse: z.ZodType<AuthLoginResponse> = z
@@ -3073,6 +3146,8 @@ const ValidationError: z.ZodType<ValidationError> = z
     loc: z.array(z.union([z.string(), z.number()])),
     msg: z.string(),
     type: z.string(),
+    input: z.unknown().optional(),
+    ctx: z.object({}).partial().passthrough().optional(),
   })
   .passthrough();
 const HTTPValidationError: z.ZodType<HTTPValidationError> = z
@@ -3130,6 +3205,44 @@ const UpdateProfileResponse: z.ZodType<UpdateProfileResponse> = z
     message: z.string().optional().default("Profile updated successfully"),
   })
   .passthrough();
+const NomineeAccessRead = z
+  .object({
+    account_holder_username: z
+      .string()
+      .describe("Username of the account holder"),
+    nominee_email: z
+      .string()
+      .email()
+      .describe("Nominee email tied to the token"),
+    access_scope: z
+      .string()
+      .describe("Granted nominee access scope")
+      .optional()
+      .default("read_only"),
+    expires_at: z.string().describe("Token expiration timestamp"),
+    last_activity_at: z
+      .union([z.string(), z.null()])
+      .describe("Last authenticated activity")
+      .optional(),
+    nominee_threshold_days: z
+      .number()
+      .int()
+      .gte(1)
+      .describe("Configured inactivity threshold value"),
+    nominee_threshold_unit: z
+      .enum(["days", "hours", "minutes", "seconds"])
+      .describe("Configured inactivity threshold unit"),
+    broker_count: z
+      .number()
+      .int()
+      .gte(0)
+      .describe("Number of brokers visible in nominee summary"),
+    broker_names: z
+      .array(z.string())
+      .describe("Broker names visible in nominee summary")
+      .optional(),
+  })
+  .passthrough();
 const UserSettingsUpdate = z
   .object({
     language: z.union([z.string(), z.null()]),
@@ -3138,6 +3251,18 @@ const UserSettingsUpdate = z
     avatar_url: z
       .union([z.string(), z.null()])
       .describe("URL to user avatar image"),
+    nominee_email: z
+      .union([z.string(), z.null()])
+      .describe("Nominee email for inactivity alerts"),
+    nominee_enabled: z
+      .union([z.boolean(), z.null()])
+      .describe("Enable nominee inactivity alerts"),
+    nominee_threshold_days: z
+      .union([z.number(), z.null()])
+      .describe("Inactivity threshold value before alert"),
+    nominee_threshold_unit: z
+      .union([z.enum(["days", "hours", "minutes", "seconds"]), z.null()])
+      .describe("Unit for the inactivity threshold value"),
   })
   .partial()
   .passthrough();
@@ -3182,7 +3307,7 @@ const SystemInfoResponse: z.ZodType<SystemInfoResponse> = z
   .passthrough();
 const Body_upload_file_api_v1_uploads_post = z
   .object({
-    file: z.instanceof(File),
+    file: z.string(),
     description: z.union([z.string(), z.null()]).optional(),
   })
   .passthrough();
@@ -5087,7 +5212,7 @@ const BRAccessBulkResponse: z.ZodType<BRAccessBulkResponse> = z.object({
     .optional(),
 });
 const Body_upload_file_api_v1_brokers_import_upload_post = z
-  .object({ file: z.instanceof(File).describe("Broker report file to upload") })
+  .object({ file: z.string().describe("Broker report file to upload") })
   .passthrough();
 const BRIMFileStatus = z.enum(["uploaded", "parsed", "failed"]);
 const BRIMFileInfo: z.ZodType<BRIMFileInfo> = z
@@ -5580,6 +5705,7 @@ export const schemas = {
   ChangePasswordResponse,
   UpdateProfileRequest,
   UpdateProfileResponse,
+  NomineeAccessRead,
   UserSettingsUpdate,
   GlobalSettingRead,
   GlobalSettingsListResponse,
@@ -7220,9 +7346,7 @@ Returns file metadata including compatible plugins.`,
         name: "body",
         type: "Body",
         schema: z
-          .object({
-            file: z.instanceof(File).describe("Broker report file to upload"),
-          })
+          .object({ file: z.string().describe("Broker report file to upload") })
           .passthrough(),
       },
       {
@@ -7560,6 +7684,31 @@ Returns:
       },
     ],
     response: FXDeletePairSourcesResponse,
+    errors: [
+      {
+        status: 422,
+        description: `Validation Error`,
+        schema: HTTPValidationError,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/v1/nominee/access",
+    alias: "get_nominee_access_api_v1_nominee_access_get",
+    description: `Resolve a nominee token into a restricted read-only account summary.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "token",
+        type: "Query",
+        schema: z
+          .string()
+          .min(16)
+          .describe("Nominee access token from the email link"),
+      },
+    ],
+    response: NomineeAccessRead,
     errors: [
       {
         status: 422,

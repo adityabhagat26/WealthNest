@@ -13,6 +13,8 @@ Provides shared utilities for all CLI modules:
 import os
 import socket
 import subprocess
+import sys
+import shutil
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -213,9 +215,11 @@ def run_command(cmd: list, cwd: Optional[Path] = None, env: Optional[dict] = Non
     if env:
         full_env.update(env)
 
+    resolved_cmd = _resolve_windows_command(cmd, full_env)
+
     try:
         result = subprocess.run(
-            cmd,
+            resolved_cmd,
             cwd=cwd or get_project_root(),
             env=full_env,
             capture_output=True,
@@ -242,9 +246,11 @@ def run_command_live(cmd: list, cwd: Optional[Path] = None, env: Optional[dict] 
     if env:
         full_env.update(env)
 
+    resolved_cmd = _resolve_windows_command(cmd, full_env)
+
     try:
         result = subprocess.run(
-            cmd,
+            resolved_cmd,
             cwd=cwd or get_project_root(),
             env=full_env
             )
@@ -257,9 +263,45 @@ def run_command_live(cmd: list, cwd: Optional[Path] = None, env: Optional[dict] 
         return 1
 
 
-def run_pipenv(args: list, cwd: Optional[Path] = None) -> int:
-    """Run a pipenv command with live output."""
-    return run_command_live(["pipenv", "run"] + args, cwd=cwd)
+def _resolve_windows_command(cmd: list, env: dict) -> list:
+    """Resolve Windows .cmd/.bat launchers so subprocess can execute them reliably."""
+    if os.name != "nt" or not cmd:
+        return cmd
+
+    executable = shutil.which(cmd[0], path=env.get("PATH"))
+    if not executable:
+        return cmd
+
+    suffix = Path(executable).suffix.lower()
+    if suffix in {".cmd", ".bat"}:
+        return ["cmd.exe", "/c", executable, *cmd[1:]]
+
+    return [executable, *cmd[1:]]
+
+
+def run_pipenv(args: list, cwd: Optional[Path] = None, env: Optional[dict] = None) -> int:
+    """Run a command inside the project Python environment."""
+    project_root = get_project_root()
+    venv_scripts = project_root / "venv" / "Scripts"
+    full_env = os.environ.copy()
+    if env:
+        full_env.update(env)
+
+    if venv_scripts.exists():
+        full_env["PATH"] = str(venv_scripts) + os.pathsep + full_env.get("PATH", "")
+        resolved_args = list(args)
+        if resolved_args and resolved_args[0] == "python":
+            resolved_args[0] = sys.executable
+        return run_command_live(resolved_args, cwd=cwd, env=full_env)
+
+    if shutil.which("pipenv", path=full_env.get("PATH")):
+        return run_command_live(["pipenv", "run"] + args, cwd=cwd, env=full_env)
+
+    resolved_args = list(args)
+    if resolved_args and resolved_args[0] == "python":
+        resolved_args[0] = sys.executable
+
+    return run_command_live(resolved_args, cwd=cwd, env=full_env)
 
 
 # =============================================================================
@@ -276,22 +318,22 @@ def print_header(title: str):
 
 def print_success(msg: str):
     """Print a success message."""
-    print(f"{Colors.GREEN}✅ {msg}{Colors.NC}")
+    print(f"{Colors.GREEN}[OK] {msg}{Colors.NC}")
 
 
 def print_warning(msg: str):
     """Print a warning message."""
-    print(f"{Colors.YELLOW}⚠️  {msg}{Colors.NC}")
+    print(f"{Colors.YELLOW}[WARN] {msg}{Colors.NC}")
 
 
 def print_error(msg: str):
     """Print an error message."""
-    print(f"{Colors.RED}❌ {msg}{Colors.NC}")
+    print(f"{Colors.RED}[ERROR] {msg}{Colors.NC}")
 
 
 def print_info(msg: str):
     """Print an info message."""
-    print(f"{Colors.BLUE}ℹ️  {msg}{Colors.NC}")
+    print(f"{Colors.BLUE}[INFO] {msg}{Colors.NC}")
 
 
 # =============================================================================

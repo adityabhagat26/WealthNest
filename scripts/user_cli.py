@@ -28,7 +28,11 @@ import asyncio
 import sys
 from pathlib import Path
 
-import argcomplete
+try:
+    import argcomplete
+    HAS_ARGCOMPLETE = True
+except ImportError:
+    HAS_ARGCOMPLETE = False
 
 # Add project root to path (file is in scripts/)
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -253,7 +257,8 @@ Examples:
     # init-settings (initialize global settings)
     subparsers.add_parser("init-settings", help="Initialize global settings with defaults")
 
-    argcomplete.autocomplete(parser)
+    if HAS_ARGCOMPLETE:
+        argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
     if not args.command:

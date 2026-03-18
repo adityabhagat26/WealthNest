@@ -27,6 +27,7 @@ from backend.app.schemas.auth import (
     )
 from backend.app.services import user_service
 from backend.app.services import settings_service
+from backend.app.services.nominee_service import touch_user_activity
 from backend.app.services.auth_service import (
     verify_password,
     hash_password,
@@ -79,6 +80,7 @@ async def get_current_user(
     if not user.is_active:
         raise HTTPException(status_code=401, detail="User account is disabled")
 
+    await touch_user_activity(session, user.id)
     return user
 
 

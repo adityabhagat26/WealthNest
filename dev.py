@@ -193,8 +193,8 @@ def cmd_server(args):
     if debug_mode:
         env["LIBREFOLIO_LOG_LEVEL"] = "DEBUG"
 
-    return run_command_live([
-        "pipenv", "run", "uvicorn",
+    return run_pipenv([
+        "uvicorn",
         "backend.app.main:app",
         "--reload",
         "--host", "0.0.0.0",
@@ -219,10 +219,7 @@ def cmd_db_current(args):
     print(Colors.success(f"Current migration for: {db_path}"))
 
     env = {"DATABASE_URL": f"sqlite:///{PROJECT_ROOT / db_path}"} if db_path else {}
-    return run_command_live(
-        ["pipenv", "run", "alembic", "-c", "backend/alembic.ini", "current"],
-        env=env
-    )
+    return run_pipenv(["alembic", "-c", "backend/alembic.ini", "current"], env=env)
 
 
 def cmd_db_migrate(args):
@@ -236,8 +233,8 @@ def cmd_db_migrate(args):
     print(Colors.success(f"Creating migration: {message}"))
 
     env = {"DATABASE_URL": f"sqlite:///{PROJECT_ROOT / db_path}"} if db_path else {}
-    return run_command_live(
-        ["pipenv", "run", "alembic", "-c", "backend/alembic.ini", "revision", "--autogenerate", "-m", message],
+    return run_pipenv(
+        ["alembic", "-c", "backend/alembic.ini", "revision", "--autogenerate", "-m", message],
         env=env
     )
 
@@ -251,10 +248,7 @@ def cmd_db_upgrade(args):
     print(Colors.success(f"Upgrading database: {db_path}"))
 
     env = {"DATABASE_URL": f"sqlite:///{PROJECT_ROOT / db_path}"} if db_path else {}
-    return run_command_live(
-        ["pipenv", "run", "alembic", "-c", "backend/alembic.ini", "upgrade", "head"],
-        env=env
-    )
+    return run_pipenv(["alembic", "-c", "backend/alembic.ini", "upgrade", "head"], env=env)
 
 
 def cmd_db_downgrade(args):
@@ -266,10 +260,7 @@ def cmd_db_downgrade(args):
     print(Colors.success(f"Downgrading database: {db_path}"))
 
     env = {"DATABASE_URL": f"sqlite:///{PROJECT_ROOT / db_path}"} if db_path else {}
-    return run_command_live(
-        ["pipenv", "run", "alembic", "-c", "backend/alembic.ini", "downgrade", "-1"],
-        env=env
-    )
+    return run_pipenv(["alembic", "-c", "backend/alembic.ini", "downgrade", "-1"], env=env)
 
 
 def cmd_db_create_clean(args):
@@ -301,10 +292,7 @@ def cmd_db_create_clean(args):
     if test_mode:
         env["LIBREFOLIO_TEST_MODE"] = "1"
 
-    result = run_command_live(
-        ["pipenv", "run", "alembic", "-c", "backend/alembic.ini", "upgrade", "head"],
-        env=env
-    )
+    result = run_pipenv(["alembic", "-c", "backend/alembic.ini", "upgrade", "head"], env=env)
 
     if result == 0:
         print_success(f"Database created successfully: {db_path}")
@@ -689,10 +677,7 @@ def copy_docs_assets():
 
 def update_js_cache():
     """Update JS library cache."""
-    result = run_command_live(
-        ["pipenv", "run", "python", "scripts/update_js_cache.py"],
-        cwd=PROJECT_ROOT
-    )
+    result = run_pipenv(["python", "scripts/update_js_cache.py"], cwd=PROJECT_ROOT)
     if result == 0:
         print_success("JS libraries cached")
     else:

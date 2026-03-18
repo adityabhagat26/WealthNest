@@ -12,6 +12,7 @@ from backend.app.api.v1 import (
     brokers,
     backup,
     auth,
+    nominee,
     settings,
     system,
     uploads,
@@ -26,6 +27,7 @@ router = APIRouter()
 
 # Include sub-routers
 router.include_router(auth.router)  # Auth first (no prefix, uses /auth)
+router.include_router(nominee.router)  # Nominee token access
 router.include_router(settings.router)  # Settings
 router.include_router(system.router)  # System info
 router.include_router(uploads.router)  # File uploads

@@ -153,6 +153,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "brokers": "Broker",
+    "nominee": "Beneficiario",
     "assets": "Asset",
     "transactions": "Transazioni",
     "fx": "Tassi di Cambio",
@@ -282,6 +283,29 @@
       "editorDesc": "Può modificare transazioni",
       "viewerDesc": "Sola lettura"
     }
+  },
+  "nominee": {
+    "badge": "Protezione beneficiario",
+    "title": "Beneficiario",
+    "subtitle": "Scegli chi deve ricevere un'email automatica se il tuo account resta inattivo troppo a lungo.",
+    "lastActivity": "Ultima attivita",
+    "lastEmail": "Ultima email al beneficiario",
+    "loading": "Caricamento impostazioni beneficiario...",
+    "emailLabel": "Email beneficiario",
+    "toggleTitle": "Abilita email al beneficiario",
+    "toggleHint": "Attiva questa opzione solo dopo aver inserito l'indirizzo email da notificare.",
+    "thresholdLabel": "Soglia in giorni",
+    "thresholdHint": "Esempio: imposta {value} {unit} per inviare l'email dopo quel periodo di inattivita.",
+    "deliveryTitle": "Nota invio",
+    "deliveryHint": "L'invio delle email dipende dai valori SMTP configurati nel file .env.",
+    "saveSuccess": "Impostazioni beneficiario salvate con successo.",
+    "footerNote": "Questa pagina mantiene separato il contatto del beneficiario dai broker, ma lo collega comunque alla protezione per inattivita.",
+    "saveButton": "Salva impostazioni beneficiario",
+    "saving": "Salvataggio...",
+    "unitDays": "Giorni",
+    "unitHours": "Ore",
+    "unitMinutes": "Minuti",
+    "unitSeconds": "Secondi"
   },
   "assets": {
     "title": "Asset",

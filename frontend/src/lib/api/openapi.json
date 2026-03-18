@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "LibreFolio",
-    "version": "v0.4.26-1-g9b0e563-dirty"
+    "version": "v0.4.27-dirty"
   },
   "paths": {
     "/api/v1/auth/login": {
@@ -234,6 +234,52 @@
                   "additionalProperties": true,
                   "type": "object",
                   "title": "Response Delete Own Account Api V1 Auth Users Me Delete"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/nominee/access": {
+      "get": {
+        "tags": [
+          "Nominee"
+        ],
+        "summary": "Get Nominee Access",
+        "description": "Resolve a nominee token into a restricted read-only account summary.",
+        "operationId": "get_nominee_access_api_v1_nominee_access_get",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 16,
+              "description": "Nominee access token from the email link",
+              "title": "Token"
+            },
+            "description": "Nominee access token from the email link"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NomineeAccessRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -5732,7 +5778,7 @@
         "properties": {
           "file": {
             "type": "string",
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "File",
             "description": "Broker report file to upload"
           }
@@ -5747,7 +5793,7 @@
         "properties": {
           "file": {
             "type": "string",
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "File"
           },
           "description": {
@@ -9085,6 +9131,87 @@
         "title": "IdentifierType",
         "description": "Asset identifier type.\n\nUsage: Specify which type of identifier is stored in the 'identifier' field.\n\n- ISIN: International Securities Identification Number (e.g., US0378331005 for Apple)\n- TICKER: Stock ticker symbol (e.g., AAPL, MSFT)\n- CUSIP: Committee on Uniform Securities Identification Procedures (US/Canada)\n- SEDOL: Stock Exchange Daily Official List (UK)\n- FIGI: Financial Instrument Global Identifier (Bloomberg standard)\n- UUID: Universal Unique Identifier (for custom/synthetic assets)\n- OTHER: Any other identifier type not listed above\n\nImpact: Used for data validation and plugin selection. Some plugins may only\nwork with specific identifier types (e.g., Yahoo Finance prefers TICKER).\n\n\u26a0\ufe0f  DEPENDENT SCHEMAS - If you add/remove values, update these files:\n\n1. DATABASE SCHEMA:\n   - backend/alembic/versions/001_initial.py\n     \u2192 Add column: identifier_{value.lower()} in assets table\n     \u2192 Add index if frequently searched (ISIN, TICKER have indexes)\n\n2. SQLMODEL (this file):\n   - Asset class below\n     \u2192 Add field: identifier_{value.lower()}: Optional[str]\n     \u2192 Add validator if needed (e.g., ISIN requires 12 chars)\n\n3. PYDANTIC SCHEMAS (backend/app/schemas/assets.py):\n   - FAAssetCreateItem: Add identifier_{value.lower()} field\n   - FAAssetPatchItem: Add identifier_{value.lower()} field\n   - FAinfoResponse: Add identifier_{value.lower()} field\n   - FAAinfoFiltersRequest: Add filter field (exact or partial match)\n\n4. SERVICE LAYER (backend/app/services/asset_source.py):\n   - list_assets(): Add condition for new filter\n   - create_assets_bulk(): Pass new field to Asset()\n\n5. BRIM PROVIDER (backend/app/services/brim_provider.py):\n   - search_asset_candidates(): Add search priority if relevant\n\n6. TESTS:\n   - test_identifier_columns_match_enum() will FAIL automatically\n     if Asset.identifier_{value.lower()} is missing\n\nRun: pytest backend/test_scripts/test_db/db_schema_validate.py::test_identifier_columns_match_enum -v"
       },
+      "NomineeAccessRead": {
+        "properties": {
+          "account_holder_username": {
+            "type": "string",
+            "title": "Account Holder Username",
+            "description": "Username of the account holder"
+          },
+          "nominee_email": {
+            "type": "string",
+            "format": "email",
+            "title": "Nominee Email",
+            "description": "Nominee email tied to the token"
+          },
+          "access_scope": {
+            "type": "string",
+            "const": "read_only",
+            "title": "Access Scope",
+            "description": "Granted nominee access scope",
+            "default": "read_only"
+          },
+          "expires_at": {
+            "type": "string",
+            "title": "Expires At",
+            "description": "Token expiration timestamp"
+          },
+          "last_activity_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Activity At",
+            "description": "Last authenticated activity"
+          },
+          "nominee_threshold_days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Nominee Threshold Days",
+            "description": "Configured inactivity threshold value"
+          },
+          "nominee_threshold_unit": {
+            "type": "string",
+            "enum": [
+              "days",
+              "hours",
+              "minutes",
+              "seconds"
+            ],
+            "title": "Nominee Threshold Unit",
+            "description": "Configured inactivity threshold unit"
+          },
+          "broker_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Broker Count",
+            "description": "Number of brokers visible in nominee summary"
+          },
+          "broker_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Broker Names",
+            "description": "Broker names visible in nominee summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_holder_username",
+          "nominee_email",
+          "expires_at",
+          "nominee_threshold_days",
+          "nominee_threshold_unit",
+          "broker_count"
+        ],
+        "title": "NomineeAccessRead",
+        "description": "Read-only nominee access payload."
+      },
       "OldNew_Union_str__NoneType__": {
         "properties": {
           "info": {
@@ -10300,6 +10427,69 @@
             ],
             "title": "Avatar Url",
             "description": "URL to user avatar image"
+          },
+          "nominee_email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nominee Email",
+            "description": "Nominee email for inactivity alerts"
+          },
+          "nominee_enabled": {
+            "type": "boolean",
+            "title": "Nominee Enabled",
+            "description": "Whether nominee alerts are enabled",
+            "default": false
+          },
+          "nominee_threshold_days": {
+            "type": "integer",
+            "maximum": 3650.0,
+            "minimum": 1.0,
+            "title": "Nominee Threshold Days",
+            "description": "Inactivity threshold value before alert",
+            "default": 30
+          },
+          "nominee_threshold_unit": {
+            "type": "string",
+            "enum": [
+              "days",
+              "hours",
+              "minutes",
+              "seconds"
+            ],
+            "title": "Nominee Threshold Unit",
+            "description": "Unit for the inactivity threshold value",
+            "default": "days"
+          },
+          "last_activity_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Activity At",
+            "description": "Last authenticated activity timestamp"
+          },
+          "nominee_last_notified_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nominee Last Notified At",
+            "description": "Last nominee email notification timestamp"
           }
         },
         "type": "object",
@@ -10367,6 +10557,63 @@
             ],
             "title": "Avatar Url",
             "description": "URL to user avatar image"
+          },
+          "nominee_email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nominee Email",
+            "description": "Nominee email for inactivity alerts"
+          },
+          "nominee_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nominee Enabled",
+            "description": "Enable nominee inactivity alerts"
+          },
+          "nominee_threshold_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3650.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nominee Threshold Days",
+            "description": "Inactivity threshold value before alert"
+          },
+          "nominee_threshold_unit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "days",
+                  "hours",
+                  "minutes",
+                  "seconds"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nominee Threshold Unit",
+            "description": "Unit for the inactivity threshold value"
           }
         },
         "type": "object",
@@ -10396,6 +10643,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",

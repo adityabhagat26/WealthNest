@@ -26,7 +26,11 @@ import traceback
 # Ensure project root is in path (file is in scripts/)
 from pathlib import Path
 
-import argcomplete
+try:
+    import argcomplete
+    HAS_ARGCOMPLETE = True
+except ImportError:
+    HAS_ARGCOMPLETE = False
 
 PROJECT_ROOT = Path(__file__).parent.parent
 import sys
@@ -2547,7 +2551,8 @@ def main():
 
     parser = create_parser()
 
-    argcomplete.autocomplete(parser)
+    if HAS_ARGCOMPLETE:
+        argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
     # If no category provided, show help

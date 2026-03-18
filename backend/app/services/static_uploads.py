@@ -28,6 +28,7 @@ Usage:
 
 import json
 import mimetypes
+import os
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -35,12 +36,8 @@ from typing import List, Optional, Tuple
 
 import structlog
 
-try:
-    import magic
-
-    MAGIC_AVAILABLE = True
-except ImportError:
-    MAGIC_AVAILABLE = False
+magic = None
+MAGIC_AVAILABLE: Optional[bool] = None
 
 from backend.app.config import get_data_dir
 from backend.app.schemas.uploads import UploadFileInfo
@@ -170,7 +167,22 @@ def _detect_actual_mime_type(content: bytes) -> Optional[str]:
 
     Returns None if python-magic is not available.
     """
-    if not MAGIC_AVAILABLE:
+    global magic, MAGIC_AVAILABLE
+
+    if MAGIC_AVAILABLE is None:
+        # Avoid importing python-magic during app startup. On Windows this can
+        # be slow or fail when libmagic binaries are not configured.
+        if os.name == "nt":
+            MAGIC_AVAILABLE = False
+        else:
+            try:
+                import magic as magic_module
+                magic = magic_module
+                MAGIC_AVAILABLE = True
+            except ImportError:
+                MAGIC_AVAILABLE = False
+
+    if not MAGIC_AVAILABLE or magic is None:
         return None
     try:
         return magic.from_buffer(content, mime=True)

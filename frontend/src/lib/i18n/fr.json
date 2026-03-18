@@ -153,6 +153,7 @@
   "nav": {
     "dashboard": "Tableau de bord",
     "brokers": "Courtiers",
+    "nominee": "Beneficiaire",
     "assets": "Actifs",
     "transactions": "Transactions",
     "fx": "Taux de Change",
@@ -282,6 +283,29 @@
       "editorDesc": "Peut modifier les transactions",
       "viewerDesc": "Lecture seule"
     }
+  },
+  "nominee": {
+    "badge": "Protection beneficiaire",
+    "title": "Beneficiaire",
+    "subtitle": "Choisissez la personne qui doit recevoir un email automatique si votre compte reste inactif trop longtemps.",
+    "lastActivity": "Derniere activite",
+    "lastEmail": "Dernier email au beneficiaire",
+    "loading": "Chargement des parametres beneficiaire...",
+    "emailLabel": "Email du beneficiaire",
+    "toggleTitle": "Activer les emails beneficiaire",
+    "toggleHint": "Activez cette option uniquement apres avoir ajoute l'adresse email a notifier.",
+    "thresholdLabel": "Seuil en jours",
+    "thresholdHint": "Exemple : definissez {value} {unit} pour envoyer l'email apres cette duree d'inactivite.",
+    "deliveryTitle": "Note d'envoi",
+    "deliveryHint": "L'envoi d'emails depend des valeurs SMTP configurees dans le fichier .env.",
+    "saveSuccess": "Parametres beneficiaire enregistres avec succes.",
+    "footerNote": "Cette page garde le contact du beneficiaire separe des courtiers tout en le reliant a votre protection contre l'inactivite.",
+    "saveButton": "Enregistrer les parametres beneficiaire",
+    "saving": "Enregistrement...",
+    "unitDays": "Jours",
+    "unitHours": "Heures",
+    "unitMinutes": "Minutes",
+    "unitSeconds": "Secondes"
   },
   "assets": {
     "title": "Actifs",

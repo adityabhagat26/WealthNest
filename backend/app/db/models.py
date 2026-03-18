@@ -281,6 +281,12 @@ class UserSettings(SQLModel, table=True):
     language: str = Field(default="en", max_length=5)  # e.g., "en", "it", "fr", "es"
     theme: str = Field(default="light", max_length=20)  # e.g., "light", "dark"
     avatar_url: Optional[str] = Field(default=None, max_length=500)  # URL to user avatar image
+    nominee_email: Optional[str] = Field(default=None, max_length=255)
+    nominee_enabled: bool = Field(default=False)
+    nominee_threshold_days: int = Field(default=30)
+    nominee_threshold_unit: str = Field(default="days", max_length=20)
+    last_activity_at: datetime = Field(default_factory=utcnow)
+    nominee_last_notified_at: Optional[datetime] = Field(default=None)
 
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
@@ -290,6 +296,31 @@ class UserSettings(SQLModel, table=True):
     def validate_base_currency(cls, v: Any) -> str:
         """Validate base_currency against ISO 4217 + crypto."""
         return _validate_currency_field(v)
+
+
+class NomineeAccessToken(SQLModel, table=True):
+    """
+    Expiring read-only nominee access token.
+
+    Tokens are stored hashed and resolved from a raw token passed in the email link.
+    """
+
+    __tablename__ = "nominee_access_tokens"
+    __table_args__ = (
+        Index("ix_nominee_access_tokens_user_id_expires_at", "user_id", "expires_at"),
+        Index("ix_nominee_access_tokens_nominee_email", "nominee_email"),
+    )
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id", nullable=False, index=True)
+    nominee_email: str = Field(nullable=False, max_length=255)
+    token_hash: str = Field(nullable=False, unique=True, index=True, max_length=64)
+    expires_at: datetime = Field(nullable=False)
+    last_used_at: Optional[datetime] = Field(default=None)
+    revoked_at: Optional[datetime] = Field(default=None)
+
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
 
 
 class GlobalSetting(SQLModel, table=True):
@@ -882,6 +913,7 @@ class AssetProviderAssignment(SQLModel, table=True):
 @event.listens_for(AssetProviderAssignment, "before_update")
 @event.listens_for(FxCurrencyPairSource, "before_update")
 @event.listens_for(UserSettings, "before_update")
+@event.listens_for(NomineeAccessToken, "before_update")
 @event.listens_for(BrokerUserAccess, "before_update")
 def receive_before_update(mapper, connection, target):
     """Update updated_at timestamp on update."""

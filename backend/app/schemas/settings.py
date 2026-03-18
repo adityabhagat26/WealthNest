@@ -6,7 +6,7 @@ Schemas for user settings and global settings management.
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 from backend.app.schemas.common import BaseListResponse
 from backend.app.utils.datetime_utils import UTCDateTime
@@ -24,6 +24,16 @@ class UserSettingsRead(BaseModel):
     base_currency: str = Field(..., description="Base currency for display (ISO 4217)")
     theme: Literal["light", "dark", "auto"] = Field(..., description="UI theme")
     avatar_url: Optional[str] = Field(None, description="URL to user avatar image")
+    nominee_email: Optional[EmailStr] = Field(None, description="Nominee email for inactivity alerts")
+    nominee_enabled: bool = Field(False, description="Whether nominee alerts are enabled")
+    nominee_threshold_days: int = Field(30, ge=1, le=3650, description="Inactivity threshold value before alert")
+    nominee_threshold_unit: Literal["days", "hours", "minutes", "seconds"] = Field(
+        "days", description="Unit for the inactivity threshold value"
+    )
+    last_activity_at: Optional[UTCDateTime] = Field(None, description="Last authenticated activity timestamp")
+    nominee_last_notified_at: Optional[UTCDateTime] = Field(
+        None, description="Last nominee email notification timestamp"
+    )
 
 
 class UserSettingsUpdate(BaseModel):
@@ -33,6 +43,16 @@ class UserSettingsUpdate(BaseModel):
     base_currency: Optional[str] = Field(None, min_length=3, max_length=3)
     theme: Optional[Literal["light", "dark", "auto"]] = None
     avatar_url: Optional[str] = Field(None, max_length=500, description="URL to user avatar image")
+    nominee_email: Optional[EmailStr] = Field(
+        None, description="Nominee email for inactivity alerts"
+    )
+    nominee_enabled: Optional[bool] = Field(None, description="Enable nominee inactivity alerts")
+    nominee_threshold_days: Optional[int] = Field(
+        None, ge=1, le=3650, description="Inactivity threshold value before alert"
+    )
+    nominee_threshold_unit: Optional[Literal["days", "hours", "minutes", "seconds"]] = Field(
+        None, description="Unit for the inactivity threshold value"
+    )
 
 
 # ============================================================================

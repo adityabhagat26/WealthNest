@@ -7,6 +7,7 @@
 # Usage:
 #   ./dev.sh <command> [args...]
 #
+
 # For full help: ./dev.py --help
 # For autocompletion, add to ~/.bashrc or ~/.zshrc:
 #   eval "$(register-python-argcomplete dev.py)"

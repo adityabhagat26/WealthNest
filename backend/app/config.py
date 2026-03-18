@@ -102,9 +102,21 @@ class Settings(BaseSettings):
 
     # CORS
     BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    FRONTEND_BASE_URL: str = "http://localhost:5173"
 
     # Image Preview Cache
     PREVIEW_CACHE_MAX_MB: int = 50
+
+    # Nominee notification email
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_USE_TLS: bool = True
+    NOMINEE_EMAIL_FROM: str = ""
+    NOMINEE_CHECK_INTERVAL_MINUTES: int = 60
+    NOMINEE_CHECK_INTERVAL_SECONDS: int = 0
+    NOMINEE_ACCESS_TOKEN_TTL_HOURS: int = 72
 
     model_config = ConfigDict(
         env_file=str(PROJECT_ROOT / ".env"),

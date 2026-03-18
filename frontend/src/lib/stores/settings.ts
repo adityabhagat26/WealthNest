@@ -18,7 +18,13 @@ const defaultSettings: UserSettings = {
     language: 'en',
     base_currency: 'EUR',
     theme: 'auto',
-    avatar_url: null
+    avatar_url: null,
+    nominee_email: null,
+    nominee_enabled: false,
+    nominee_threshold_days: 30,
+    nominee_threshold_unit: 'days',
+    last_activity_at: null,
+    nominee_last_notified_at: null
 };
 
 /**

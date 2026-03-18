@@ -153,6 +153,7 @@
   "nav": {
     "dashboard": "Panel",
     "brokers": "Brókeres",
+    "nominee": "Nominee",
     "assets": "Activos",
     "transactions": "Transacciones",
     "fx": "Tipos de Cambio",
@@ -282,6 +283,29 @@
       "editorDesc": "Puede modificar transacciones",
       "viewerDesc": "Solo lectura"
     }
+  },
+  "nominee": {
+    "badge": "Proteccion nominee",
+    "title": "Nominee",
+    "subtitle": "Elige quien debe recibir un correo automatico si tu cuenta permanece inactiva durante demasiado tiempo.",
+    "lastActivity": "Ultima actividad",
+    "lastEmail": "Ultimo correo al nominee",
+    "loading": "Cargando configuracion del nominee...",
+    "emailLabel": "Correo del nominee",
+    "toggleTitle": "Activar correos del nominee",
+    "toggleHint": "Activa esto solo despues de agregar la direccion de correo que LibreFolio debe notificar.",
+    "thresholdLabel": "Umbral en dias",
+    "thresholdHint": "Ejemplo: configura {value} {unit} para enviar el correo despues de ese tiempo de inactividad.",
+    "deliveryTitle": "Nota de envio",
+    "deliveryHint": "El envio de correos depende de los valores SMTP configurados en el archivo .env.",
+    "saveSuccess": "La configuracion del nominee se guardo correctamente.",
+    "footerNote": "Esta pagina mantiene el contacto del nominee separado de los brokers, pero conectado a tu proteccion por inactividad.",
+    "saveButton": "Guardar configuracion del nominee",
+    "saving": "Guardando...",
+    "unitDays": "Dias",
+    "unitHours": "Horas",
+    "unitMinutes": "Minutos",
+    "unitSeconds": "Segundos"
   },
   "assets": {
     "title": "Activos",

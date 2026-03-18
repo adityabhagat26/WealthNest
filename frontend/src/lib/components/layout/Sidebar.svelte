@@ -5,7 +5,7 @@
     import {_} from '$lib/i18n';
     import {auth} from '$lib/stores/auth';
     import {userSettings} from '$lib/stores/settings';
-    import {ArrowRightLeft, BarChart3, Briefcase, Coins, Files, LayoutDashboard, LogOut, Settings, User, X} from 'lucide-svelte';
+    import {ArrowRightLeft, BarChart3, BellRing, Briefcase, Coins, Files, LayoutDashboard, LogOut, Settings, User, X} from 'lucide-svelte';
     import {APP_VERSION} from '$lib/version';
 
     // Mobile sidebar state (exported so parent can control it)
@@ -32,6 +32,7 @@
     const portfolioItems = [
         {href: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard'},
         {href: '/brokers', icon: Briefcase, labelKey: 'nav.brokers'},
+        {href: '/nominee', icon: BellRing, labelKey: 'nav.nominee'},
         {href: '/transactions', icon: ArrowRightLeft, labelKey: 'nav.transactions'}
     ];
 

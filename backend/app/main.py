@@ -6,6 +6,7 @@ Main entry point for the backend API.
 import os
 import subprocess
 import sys
+import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator
@@ -21,6 +22,7 @@ from backend.app.config import (
     PROJECT_NAME, API_V1_PREFIX, get_version,
 )
 from backend.app.logging_config import configure_logging, get_logger
+from backend.app.services.nominee_service import nominee_monitor_loop
 from backend.app.utils.version import get_git_version
 
 # Check for test mode via environment variable ONLY
@@ -159,8 +161,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     # Initialize global settings with defaults (if not already present)
     await _initialize_global_settings()
 
+    nominee_stop_event = asyncio.Event()
+    nominee_task = asyncio.create_task(nominee_monitor_loop(nominee_stop_event))
+
     yield
     # Shutdown
+    nominee_stop_event.set()
+    await nominee_task
     logger.info("Shutting down LibreFolio")
 
 
