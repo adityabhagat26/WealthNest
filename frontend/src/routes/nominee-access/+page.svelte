@@ -20,6 +20,26 @@
         nominee_threshold_unit: ThresholdUnit;
         broker_count: number;
         broker_names: string[];
+        banking_details: {
+            broker_id: number;
+            broker_name: string;
+            cash_balances: {
+                currency: string;
+                amount: string;
+            }[];
+        }[];
+        account_cash_totals: {
+            currency: string;
+            amount: string;
+        }[];
+        asset_holdings: {
+            broker_id: number;
+            broker_name: string;
+            asset_id: number;
+            asset_name: string;
+            quantity: string;
+            asset_currency: string;
+        }[];
     };
 
     let loading = true;
@@ -38,6 +58,11 @@
         lastActivity: 'Last activity',
         configuredThreshold: 'Configured inactivity threshold',
         visibleBrokers: 'Visible brokers',
+        bankingDetails: 'Banking details',
+        assetHoldings: 'Asset holdings',
+        noBanking: 'No banking balances are currently available.',
+        allAccountCash: 'All accounts cash totals',
+        noAssets: 'No asset holdings are currently available.',
         noActivity: 'Not available',
         readOnly: 'Read-only nominee access',
         backToLogin: 'Open main login'
@@ -191,6 +216,68 @@
                             {:else}
                                 <div class="mt-4 rounded-2xl border border-dashed border-slate-700 px-4 py-5 text-sm text-slate-400">
                                     No broker summaries are currently available for this account.
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 lg:grid-cols-2">
+                        <div class="rounded-3xl border border-slate-700 bg-slate-900 p-5">
+                            <h2 class="text-lg font-semibold text-white">{copy.allAccountCash}</h2>
+                            {#if data.account_cash_totals.length > 0}
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    {#each data.account_cash_totals as total}
+                                        <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-100">
+                                            {total.currency}: {total.amount}
+                                        </span>
+                                    {/each}
+                                </div>
+                            {/if}
+
+                            <h2 class="text-lg font-semibold text-white">{copy.bankingDetails}</h2>
+                            {#if data.banking_details.length > 0}
+                                <div class="mt-4 space-y-3">
+                                    {#each data.banking_details as bank}
+                                        <div class="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3">
+                                            <div class="text-sm font-semibold text-white">{bank.broker_name}</div>
+                                            {#if bank.cash_balances.length > 0}
+                                                <div class="mt-2 flex flex-wrap gap-2">
+                                                    {#each bank.cash_balances as cash}
+                                                        <span class="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-100">
+                                                            {cash.currency}: {cash.amount}
+                                                        </span>
+                                                    {/each}
+                                                </div>
+                                            {:else}
+                                                <div class="mt-2 text-sm text-slate-400">No cash balances</div>
+                                            {/if}
+                                        </div>
+                                    {/each}
+                                </div>
+                            {:else}
+                                <div class="mt-4 rounded-2xl border border-dashed border-slate-700 px-4 py-5 text-sm text-slate-400">
+                                    {copy.noBanking}
+                                </div>
+                            {/if}
+                        </div>
+
+                        <div class="rounded-3xl border border-slate-700 bg-slate-900 p-5">
+                            <h2 class="text-lg font-semibold text-white">{copy.assetHoldings}</h2>
+                            {#if data.asset_holdings.length > 0}
+                                <div class="mt-4 max-h-64 space-y-3 overflow-auto pr-1">
+                                    {#each data.asset_holdings as holding}
+                                        <div class="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3">
+                                            <div class="text-sm font-semibold text-white">{holding.asset_name}</div>
+                                            <div class="mt-1 text-xs text-slate-400">{holding.broker_name}</div>
+                                            <div class="mt-2 text-sm text-slate-100">
+                                                {holding.quantity} {holding.asset_currency}
+                                            </div>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {:else}
+                                <div class="mt-4 rounded-2xl border border-dashed border-slate-700 px-4 py-5 text-sm text-slate-400">
+                                    {copy.noAssets}
                                 </div>
                             {/if}
                         </div>

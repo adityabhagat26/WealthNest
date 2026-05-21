@@ -15,7 +15,15 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.config import get_settings
-from backend.app.db.models import Broker, BrokerUserAccess, NomineeAccessToken, User, UserSettings
+from backend.app.db.models import (
+    Asset,
+    Broker,
+    BrokerUserAccess,
+    NomineeAccessToken,
+    Transaction,
+    User,
+    UserSettings,
+)
 from backend.app.utils.datetime_utils import ensure_utc, utcnow
 
 
@@ -122,6 +130,81 @@ async def build_nominee_access_context(
     )
     broker_count = int(broker_count_result.scalar_one() or 0)
 
+    accessible_brokers_result = await session.execute(
+        select(Broker.id, Broker.name)
+        .join(BrokerUserAccess, BrokerUserAccess.broker_id == Broker.id)
+        .where(BrokerUserAccess.user_id == token.user_id)
+        .order_by(Broker.name.asc())
+    )
+    accessible_brokers = list(accessible_brokers_result.all())
+    broker_name_by_id = {broker_id: broker_name for broker_id, broker_name in accessible_brokers}
+
+    banking_details = []
+    for broker_id, broker_name in accessible_brokers:
+        cash_rows_result = await session.execute(
+            select(Transaction.currency, func.sum(Transaction.amount))
+            .where(Transaction.broker_id == broker_id)
+            .where(Transaction.currency.is_not(None))
+            .group_by(Transaction.currency)
+            .order_by(Transaction.currency.asc())
+        )
+        cash_rows = [
+            {"currency": currency, "amount": str(amount)}
+            for currency, amount in cash_rows_result.all()
+            if currency is not None and amount is not None and amount != 0
+        ]
+        banking_details.append(
+            {
+                "broker_id": broker_id,
+                "broker_name": broker_name,
+                "cash_balances": cash_rows,
+            }
+        )
+
+    account_cash_totals_result = await session.execute(
+        select(Transaction.currency, func.sum(Transaction.amount))
+        .join(BrokerUserAccess, BrokerUserAccess.broker_id == Transaction.broker_id)
+        .where(BrokerUserAccess.user_id == token.user_id)
+        .where(Transaction.currency.is_not(None))
+        .group_by(Transaction.currency)
+        .order_by(Transaction.currency.asc())
+    )
+    account_cash_totals = [
+        {"currency": currency, "amount": str(amount)}
+        for currency, amount in account_cash_totals_result.all()
+        if currency is not None and amount is not None and amount != 0
+    ]
+
+    holdings_result = await session.execute(
+        select(
+            Transaction.broker_id,
+            Transaction.asset_id,
+            Asset.display_name,
+            Asset.currency,
+            func.sum(Transaction.quantity),
+        )
+        .join(Asset, Asset.id == Transaction.asset_id)
+        .join(BrokerUserAccess, BrokerUserAccess.broker_id == Transaction.broker_id)
+        .where(BrokerUserAccess.user_id == token.user_id)
+        .where(Transaction.asset_id.is_not(None))
+        .group_by(Transaction.broker_id, Transaction.asset_id, Asset.display_name, Asset.currency)
+        .order_by(Transaction.broker_id.asc(), Asset.display_name.asc())
+    )
+    asset_holdings = []
+    for broker_id, asset_id, asset_name, asset_currency, quantity in holdings_result.all():
+        if asset_id is None or quantity is None or quantity == 0:
+            continue
+        asset_holdings.append(
+            {
+                "broker_id": broker_id,
+                "broker_name": broker_name_by_id.get(broker_id, f"Broker #{broker_id}"),
+                "asset_id": int(asset_id),
+                "asset_name": asset_name,
+                "quantity": str(quantity),
+                "asset_currency": asset_currency,
+            }
+        )
+
     threshold_value = 30
     threshold_unit = "days"
     last_activity_at = None
@@ -140,4 +223,7 @@ async def build_nominee_access_context(
         "nominee_threshold_unit": threshold_unit,
         "broker_count": broker_count,
         "broker_names": broker_names,
+        "banking_details": banking_details,
+        "account_cash_totals": account_cash_totals,
+        "asset_holdings": asset_holdings,
     }

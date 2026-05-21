@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "WealthNest",
-    "version": "v0.0.0-g6ee1d66-dirty"
+    "version": "v0.0.0-g8a965c9-dirty"
   },
   "paths": {
     "/api/v1/auth/login": {
@@ -9388,6 +9388,30 @@
             "type": "array",
             "title": "Broker Names",
             "description": "Broker names visible in nominee summary"
+          },
+          "banking_details": {
+            "items": {
+              "$ref": "#/components/schemas/NomineeBankingBrokerRead"
+            },
+            "type": "array",
+            "title": "Banking Details",
+            "description": "Read-only per-broker banking balances"
+          },
+          "account_cash_totals": {
+            "items": {
+              "$ref": "#/components/schemas/NomineeCashBalanceRead"
+            },
+            "type": "array",
+            "title": "Account Cash Totals",
+            "description": "Aggregated cash balances across all visible broker accounts"
+          },
+          "asset_holdings": {
+            "items": {
+              "$ref": "#/components/schemas/NomineeAssetHoldingRead"
+            },
+            "type": "array",
+            "title": "Asset Holdings",
+            "description": "Read-only per-broker asset holdings"
           }
         },
         "type": "object",
@@ -9401,6 +9425,101 @@
         ],
         "title": "NomineeAccessRead",
         "description": "Read-only nominee access payload."
+      },
+      "NomineeAssetHoldingRead": {
+        "properties": {
+          "broker_id": {
+            "type": "integer",
+            "title": "Broker Id",
+            "description": "Broker ID"
+          },
+          "broker_name": {
+            "type": "string",
+            "title": "Broker Name",
+            "description": "Broker name"
+          },
+          "asset_id": {
+            "type": "integer",
+            "title": "Asset Id",
+            "description": "Asset ID"
+          },
+          "asset_name": {
+            "type": "string",
+            "title": "Asset Name",
+            "description": "Asset display name"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity",
+            "description": "Held quantity as string"
+          },
+          "asset_currency": {
+            "type": "string",
+            "title": "Asset Currency",
+            "description": "Asset currency code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "broker_id",
+          "broker_name",
+          "asset_id",
+          "asset_name",
+          "quantity",
+          "asset_currency"
+        ],
+        "title": "NomineeAssetHoldingRead",
+        "description": "Read-only asset holding row for nominee access."
+      },
+      "NomineeBankingBrokerRead": {
+        "properties": {
+          "broker_id": {
+            "type": "integer",
+            "title": "Broker Id",
+            "description": "Broker ID"
+          },
+          "broker_name": {
+            "type": "string",
+            "title": "Broker Name",
+            "description": "Broker name"
+          },
+          "cash_balances": {
+            "items": {
+              "$ref": "#/components/schemas/NomineeCashBalanceRead"
+            },
+            "type": "array",
+            "title": "Cash Balances",
+            "description": "Cash balances grouped by currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "broker_id",
+          "broker_name"
+        ],
+        "title": "NomineeBankingBrokerRead",
+        "description": "Read-only banking summary per broker."
+      },
+      "NomineeCashBalanceRead": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "description": "Currency code (ISO 4217)"
+          },
+          "amount": {
+            "type": "string",
+            "title": "Amount",
+            "description": "Cash balance amount as string"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "amount"
+        ],
+        "title": "NomineeCashBalanceRead",
+        "description": "Read-only cash balance row for nominee access."
       },
       "OldNew_Union_str__NoneType__": {
         "properties": {

@@ -2729,6 +2729,116 @@ type ValidationError = {
   input?: unknown | undefined;
   ctx?: {} | undefined;
 };
+type NomineeAccessRead = {
+  /**
+   * Username of the account holder
+   */
+  account_holder_username: string;
+  /**
+   * Nominee email tied to the token
+   */
+  nominee_email: string;
+  access_scope?: /**
+   * Granted nominee access scope
+   *
+   * @default "read_only"
+   */
+  string | undefined;
+  /**
+   * Token expiration timestamp
+   */
+  expires_at: string;
+  last_activity_at?:
+    | /**
+     * Last authenticated activity
+     */
+    ((string | null) | Array<string | null>)
+    | undefined;
+  /**
+   * Configured inactivity threshold value
+   *
+   * @minimum 1
+   */
+  nominee_threshold_days: number;
+  /**
+   * Configured inactivity threshold unit
+   *
+   * @enum days, hours, minutes, seconds
+   */
+  nominee_threshold_unit: "days" | "hours" | "minutes" | "seconds";
+  /**
+   * Number of brokers visible in nominee summary
+   *
+   * @minimum 0
+   */
+  broker_count: number;
+  broker_names?: /**
+   * Broker names visible in nominee summary
+   */
+  Array<string> | undefined;
+  banking_details?: /**
+   * Read-only per-broker banking balances
+   */
+  Array<NomineeBankingBrokerRead> | undefined;
+  account_cash_totals?: /**
+   * Aggregated cash balances across all visible broker accounts
+   */
+  Array<NomineeCashBalanceRead> | undefined;
+  asset_holdings?: /**
+   * Read-only per-broker asset holdings
+   */
+  Array<NomineeAssetHoldingRead> | undefined;
+};
+type NomineeBankingBrokerRead = {
+  /**
+   * Broker ID
+   */
+  broker_id: number;
+  /**
+   * Broker name
+   */
+  broker_name: string;
+  cash_balances?: /**
+   * Cash balances grouped by currency
+   */
+  Array<NomineeCashBalanceRead> | undefined;
+};
+type NomineeCashBalanceRead = {
+  /**
+   * Currency code (ISO 4217)
+   */
+  currency: string;
+  /**
+   * Cash balance amount as string
+   */
+  amount: string;
+};
+type NomineeAssetHoldingRead = {
+  /**
+   * Broker ID
+   */
+  broker_id: number;
+  /**
+   * Broker name
+   */
+  broker_name: string;
+  /**
+   * Asset ID
+   */
+  asset_id: number;
+  /**
+   * Asset display name
+   */
+  asset_name: string;
+  /**
+   * Held quantity as string
+   */
+  quantity: string;
+  /**
+   * Asset currency code
+   */
+  asset_currency: string;
+};
 type SystemInfoResponse = {
   app_version: string;
   python_version: string;
@@ -3262,7 +3372,33 @@ const UpdateProfileResponse: z.ZodType<UpdateProfileResponse> = z
     message: z.string().optional().default("Profile updated successfully"),
   })
   .passthrough();
-const NomineeAccessRead = z
+const NomineeCashBalanceRead: z.ZodType<NomineeCashBalanceRead> = z
+  .object({
+    currency: z.string().describe("Currency code (ISO 4217)"),
+    amount: z.string().describe("Cash balance amount as string"),
+  })
+  .passthrough();
+const NomineeBankingBrokerRead: z.ZodType<NomineeBankingBrokerRead> = z
+  .object({
+    broker_id: z.number().int().describe("Broker ID"),
+    broker_name: z.string().describe("Broker name"),
+    cash_balances: z
+      .array(NomineeCashBalanceRead)
+      .describe("Cash balances grouped by currency")
+      .optional(),
+  })
+  .passthrough();
+const NomineeAssetHoldingRead: z.ZodType<NomineeAssetHoldingRead> = z
+  .object({
+    broker_id: z.number().int().describe("Broker ID"),
+    broker_name: z.string().describe("Broker name"),
+    asset_id: z.number().int().describe("Asset ID"),
+    asset_name: z.string().describe("Asset display name"),
+    quantity: z.string().describe("Held quantity as string"),
+    asset_currency: z.string().describe("Asset currency code"),
+  })
+  .passthrough();
+const NomineeAccessRead: z.ZodType<NomineeAccessRead> = z
   .object({
     account_holder_username: z
       .string()
@@ -3297,6 +3433,18 @@ const NomineeAccessRead = z
     broker_names: z
       .array(z.string())
       .describe("Broker names visible in nominee summary")
+      .optional(),
+    banking_details: z
+      .array(NomineeBankingBrokerRead)
+      .describe("Read-only per-broker banking balances")
+      .optional(),
+    account_cash_totals: z
+      .array(NomineeCashBalanceRead)
+      .describe("Aggregated cash balances across all visible broker accounts")
+      .optional(),
+    asset_holdings: z
+      .array(NomineeAssetHoldingRead)
+      .describe("Read-only per-broker asset holdings")
       .optional(),
   })
   .passthrough();
@@ -5795,6 +5943,9 @@ export const schemas = {
   ChangePasswordResponse,
   UpdateProfileRequest,
   UpdateProfileResponse,
+  NomineeCashBalanceRead,
+  NomineeBankingBrokerRead,
+  NomineeAssetHoldingRead,
   NomineeAccessRead,
   UserSettingsUpdate,
   GlobalSettingRead,
