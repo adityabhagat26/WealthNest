@@ -12,6 +12,7 @@
     let brokers: Broker[] = [];
     let loading = true;
     let error: string | null = null;
+    let deleteError: string | null = null;
 
     // Modal state
     let modalOpen = false;
@@ -95,13 +96,62 @@
         if (!deletingBroker) return;
 
         deleteLoading = true;
+        deleteError = null;
         try {
-            await zodiosApi.delete_brokers_api_v1_brokers_delete(undefined, {queries: {ids: [deletingBroker.id], force: event.detail.force}});
+            const response = await zodiosApi.delete_brokers_api_v1_brokers_delete(undefined, {
+                queries: {ids: [deletingBroker.id], force: event.detail.force}
+            });
+
+            const firstResult = response?.results?.[0];
+            if (firstResult && !firstResult.success) {
+                const message = firstResult.message || 'Failed to delete broker';
+                if (!event.detail.force && message.includes('Use force=True')) {
+                    const forceResponse = await zodiosApi.delete_brokers_api_v1_brokers_delete(undefined, {
+                        queries: {ids: [deletingBroker.id], force: true}
+                    });
+                    const forceResult = forceResponse?.results?.[0];
+                    if (forceResult && !forceResult.success) {
+                        deleteError = forceResult.message || 'Failed to force delete broker';
+                        return;
+                    }
+                } else {
+                    deleteError = message;
+                    return;
+                }
+            }
+
             deleteDialogOpen = false;
             deletingBroker = null;
             await loadBrokers();
         } catch (e) {
             console.error('Failed to delete broker:', e);
+            const err = e as {
+                response?: { data?: { detail?: string } };
+                message?: string;
+            };
+            const detail = err?.response?.data?.detail ?? err?.message ?? 'Failed to delete broker';
+
+            // If backend explicitly asks force=True (broker has transactions),
+            // retry automatically once to match user intent.
+            if (!event.detail.force && typeof detail === 'string' && detail.includes('force=True')) {
+                try {
+                    await zodiosApi.delete_brokers_api_v1_brokers_delete(undefined, {
+                        queries: {ids: [deletingBroker.id], force: true}
+                    });
+                    deleteDialogOpen = false;
+                    deletingBroker = null;
+                    await loadBrokers();
+                    return;
+                } catch (retryErr) {
+                    const r = retryErr as {
+                        response?: { data?: { detail?: string } };
+                        message?: string;
+                    };
+                    deleteError = r?.response?.data?.detail ?? r?.message ?? 'Failed to force delete broker';
+                }
+            } else {
+                deleteError = typeof detail === 'string' ? detail : 'Failed to delete broker';
+            }
         } finally {
             deleteLoading = false;
         }
@@ -189,6 +239,11 @@
             </button>
         </div>
     {:else}
+        {#if deleteError}
+            <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
+                {deleteError}
+            </div>
+        {/if}
         <!-- Broker grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {#each brokers as broker (broker.id)}

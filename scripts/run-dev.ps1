@@ -9,20 +9,41 @@ $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
 function Add-ProjectVenvToPath {
-    $venvScripts = Join-Path $ProjectRoot "venv\Scripts"
-    if (Test-Path $venvScripts) {
-        $env:PATH = "$venvScripts;$env:PATH"
+    $venvCandidates = @(
+        (Join-Path $ProjectRoot "venv\Scripts"),
+        (Join-Path $ProjectRoot ".venv\Scripts")
+    )
+
+    foreach ($venvScripts in $venvCandidates) {
+        if (Test-Path $venvScripts) {
+            $env:PATH = "$venvScripts;$env:PATH"
+            break
+        }
     }
 }
 
 function Get-PythonCommand {
-    $venvPython = Join-Path $ProjectRoot "venv\Scripts\python.exe"
-    if (Test-Path $venvPython) {
-        return @($venvPython)
+    $venvPythonCandidates = @(
+        (Join-Path $ProjectRoot "venv\Scripts\python.exe"),
+        (Join-Path $ProjectRoot ".venv\Scripts\python.exe")
+    )
+
+    foreach ($venvPython in $venvPythonCandidates) {
+        if (Test-Path $venvPython) {
+            return @($venvPython)
+        }
     }
 
     if (Get-Command py -ErrorAction SilentlyContinue) {
-        return @("py")
+        try {
+            & py -c "import sys" 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                return @("py")
+            }
+        }
+        catch {
+            # fall through to other launchers
+        }
     }
 
     if (Get-Command python -ErrorAction SilentlyContinue) {
@@ -30,6 +51,74 @@ function Get-PythonCommand {
     }
 
     throw "Unable to find Python. Activate the project virtual environment or make sure 'py' or 'python' is available on PATH."
+}
+
+function Get-PythonVersion {
+    param(
+        [string[]]$PythonCommand
+    )
+
+    $launcher = $PythonCommand[0]
+    $launcherArgs = @()
+    if ($PythonCommand.Count -gt 1) {
+        $launcherArgs = $PythonCommand[1..($PythonCommand.Count - 1)]
+    }
+
+    $versionRaw = & $launcher @launcherArgs -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+    if ($LASTEXITCODE -ne 0) {
+        return $null
+    }
+
+    return $versionRaw.Trim()
+}
+
+function Is-SupportedPythonVersion {
+    param(
+        [string]$Version
+    )
+
+    if (-not $Version -or $Version -notmatch "^\d+\.\d+$") {
+        return $false
+    }
+
+    $parts = $Version.Split(".")
+    $major = [int]$parts[0]
+    $minor = [int]$parts[1]
+
+    return ($major -eq 3 -and $minor -ge 11 -and $minor -le 13)
+}
+
+function Resolve-SupportedPythonCommand {
+    $candidates = @()
+
+    $venvPythonCandidates = @(
+        (Join-Path $ProjectRoot "venv\Scripts\python.exe"),
+        (Join-Path $ProjectRoot ".venv\Scripts\python.exe")
+    )
+
+    foreach ($venvPython in $venvPythonCandidates) {
+        if (Test-Path $venvPython) {
+            $candidates += ,@($venvPython)
+        }
+    }
+
+    if (Get-Command py -ErrorAction SilentlyContinue) {
+        $candidates += ,@("py")
+    }
+    if (Get-Command python -ErrorAction SilentlyContinue) {
+        $candidates += ,@("python")
+    }
+
+    foreach ($candidate in $candidates) {
+        $version = Get-PythonVersion -PythonCommand $candidate
+        if (Is-SupportedPythonVersion -Version $version) {
+            return $candidate
+        }
+    }
+
+    $defaultCandidate = Get-PythonCommand
+    $detected = Get-PythonVersion -PythonCommand $defaultCandidate
+    throw "Unsupported Python version detected ($detected). Use Python 3.11, 3.12, or 3.13 for this project."
 }
 
 function Invoke-DevPy {
@@ -88,7 +177,7 @@ function Convert-LegacyArgs {
 
 $convertedArgs = Convert-LegacyArgs -InputArgs $Args
 Add-ProjectVenvToPath
-$pythonCommand = Get-PythonCommand
+$pythonCommand = Resolve-SupportedPythonCommand
 
 if ($convertedArgs.Count -eq 0) {
     Invoke-DevPy -PythonCommand $pythonCommand -CommandArgs @("--help")

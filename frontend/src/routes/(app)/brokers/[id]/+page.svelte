@@ -314,14 +314,22 @@
                                 <tbody>
                                 {#each broker.holdings as holding}
                                     {@const totalCost = safeCurrency(holding.total_cost)}
+                                    {@const totalCostBase = safeCurrency((holding as any).total_cost_base_currency)}
                                     {@const currentValue = safeCurrency(holding.current_value)}
+                                    {@const currentValueBase = safeCurrency((holding as any).current_value_base_currency)}
                                     {@const pnl = safeCurrency(holding.unrealized_pnl)}
+                                    {@const pnlBase = safeCurrency((holding as any).unrealized_pnl_base_currency)}
                                     <tr class="border-b border-gray-50 hover:bg-gray-50">
                                         <td class="py-2 font-medium text-gray-800">{holding.asset_name}</td>
                                         <td class="py-2 text-right text-gray-600">{holding.quantity.toLocaleString()}</td>
                                         <td class="py-2 text-right text-gray-600">
                                             {#if totalCost}
                                                 {formatCurrency(totalCost.amount, totalCost.code)}
+                                                {#if totalCostBase && totalCostBase.code !== totalCost.code}
+                                                    <div class="text-xs text-gray-400">
+                                                        {formatCurrency(totalCostBase.amount, totalCostBase.code)}
+                                                    </div>
+                                                {/if}
                                             {:else}
                                                 <span class="text-gray-400">-</span>
                                             {/if}
@@ -329,6 +337,11 @@
                                         <td class="py-2 text-right text-gray-600">
                                             {#if currentValue}
                                                 {formatCurrency(currentValue.amount, currentValue.code)}
+                                                {#if currentValueBase && currentValueBase.code !== currentValue.code}
+                                                    <div class="text-xs text-gray-400">
+                                                        {formatCurrency(currentValueBase.amount, currentValueBase.code)}
+                                                    </div>
+                                                {/if}
                                             {:else}
                                                 <span class="text-gray-400">-</span>
                                             {/if}
@@ -339,6 +352,12 @@
                                                 <span class="{pnlNum >= 0 ? 'text-green-600' : 'text-red-600'}">
                                                     {pnlNum >= 0 ? '+' : ''}{formatCurrency(pnl.amount, pnl.code)}
                                                 </span>
+                                                {#if pnlBase && pnlBase.code !== pnl.code}
+                                                    {@const pnlBaseNum = parseCurrencyAmount(pnlBase.amount)}
+                                                    <div class="text-xs {pnlBaseNum >= 0 ? 'text-green-500' : 'text-red-400'}">
+                                                        {pnlBaseNum >= 0 ? '+' : ''}{formatCurrency(pnlBase.amount, pnlBase.code)}
+                                                    </div>
+                                                {/if}
                                             {:else}
                                                 <span class="text-gray-400">-</span>
                                             {/if}

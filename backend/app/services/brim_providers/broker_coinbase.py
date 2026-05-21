@@ -103,8 +103,8 @@ def _parse_coinbase_amount(value: str) -> Optional[Decimal]:
     if not value:
         return None
 
-    # Remove currency symbols
-    value = re.sub(r"[€$£]", "", value).strip()
+    # Remove common currency symbols (supports INR/rupee too)
+    value = re.sub(r"[€$£₹¥]", "", value).strip()
 
     # Handle comma as thousands separator
     value = value.replace(",", "")

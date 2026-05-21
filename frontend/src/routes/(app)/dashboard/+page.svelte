@@ -170,6 +170,8 @@
 
     $: totalHoldingsValue = brokerSummaries.reduce((sum, broker) => {
         return sum + broker.holdings.reduce((holdingSum, holding) => {
+            const currentValueBase = safeCurrency((holding as any).current_value_base_currency);
+            if (currentValueBase) return holdingSum + parseCurrencyAmount(currentValueBase.amount);
             const currentValue = safeCurrency(holding.current_value);
             if (!currentValue || currentValue.code !== baseCurrency) return holdingSum;
             return holdingSum + parseCurrencyAmount(currentValue.amount);
@@ -178,6 +180,8 @@
 
     $: totalInvestedCost = brokerSummaries.reduce((sum, broker) => {
         return sum + broker.holdings.reduce((holdingSum, holding) => {
+            const totalCostBase = safeCurrency((holding as any).total_cost_base_currency);
+            if (totalCostBase) return holdingSum + parseCurrencyAmount(totalCostBase.amount);
             const totalCost = safeCurrency(holding.total_cost);
             if (!totalCost || totalCost.code !== baseCurrency) return holdingSum;
             return holdingSum + parseCurrencyAmount(totalCost.amount);
@@ -186,6 +190,8 @@
 
     $: totalUnrealizedPnl = brokerSummaries.reduce((sum, broker) => {
         return sum + broker.holdings.reduce((holdingSum, holding) => {
+            const pnlBase = safeCurrency((holding as any).unrealized_pnl_base_currency);
+            if (pnlBase) return holdingSum + parseCurrencyAmount(pnlBase.amount);
             const pnl = safeCurrency(holding.unrealized_pnl);
             if (!pnl || pnl.code !== baseCurrency) return holdingSum;
             return holdingSum + parseCurrencyAmount(pnl.amount);

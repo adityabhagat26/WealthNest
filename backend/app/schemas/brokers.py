@@ -162,14 +162,23 @@ class BRAssetHolding(BaseModel):
 
     # Cost basis (total spent to acquire)
     total_cost: Currency = Field(..., description="Total amount spent to acquire (FIFO)")
+    total_cost_base_currency: Optional[Currency] = Field(
+        default=None, description="Total cost converted to user's base currency"
+    )
     average_cost_per_unit: Decimal = Field(..., description="Average cost per unit")
 
     # Current valuation (if price available)
     current_price: Optional[Decimal] = Field(default=None, description="Latest price per unit")
     current_value: Optional[Currency] = Field(default=None, description="Current market value")
+    current_value_base_currency: Optional[Currency] = Field(
+        default=None, description="Current market value converted to user's base currency"
+    )
 
     # Unrealized P&L
     unrealized_pnl: Optional[Currency] = Field(default=None, description="Unrealized profit/loss")
+    unrealized_pnl_base_currency: Optional[Currency] = Field(
+        default=None, description="Unrealized P&L converted to user's base currency"
+    )
     unrealized_pnl_percent: Optional[Decimal] = Field(default=None, description="Unrealized P&L %")
 
 

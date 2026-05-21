@@ -114,7 +114,7 @@ def ensure_database_exists():
 
                 logger.info("Running Alembic migrations...")
                 result = subprocess.run(
-                    ["alembic", "-c", str(alembic_ini), "upgrade", "head"],
+                    [sys.executable, "-m", "alembic", "-c", str(alembic_ini), "upgrade", "head"],
                     cwd=PROJECT_ROOT,
                     capture_output=True,
                     text=True,

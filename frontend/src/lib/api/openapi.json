@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "WealthNest",
-    "version": "v0.4.27-1-g2ee2ae4-dirty"
+    "version": "v0.0.0-gcaecd48-dirty"
   },
   "paths": {
     "/api/v1/auth/login": {
@@ -3241,6 +3241,27 @@
         }
       }
     },
+    "/api/v1/brokers/import/sample-reports/coinbase-add-assets": {
+      "get": {
+        "tags": [
+          "BR (Broker)",
+          "BR Import"
+        ],
+        "summary": "Download Coinbase Sample Report",
+        "description": "Download a ready-to-import Coinbase sample CSV.\n\nUseful for quickly testing asset import flow.\nRequires authentication.",
+        "operationId": "download_coinbase_sample_report_api_v1_brokers_import_sample_reports_coinbase_add_assets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/brokers/import/files": {
       "get": {
         "tags": [
@@ -4409,6 +4430,17 @@
             "$ref": "#/components/schemas/Currency-Output",
             "description": "Total amount spent to acquire (FIFO)"
           },
+          "total_cost_base_currency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Currency-Output"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Total cost converted to user's base currency"
+          },
           "average_cost_per_unit": {
             "type": "string",
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
@@ -4439,6 +4471,17 @@
             ],
             "description": "Current market value"
           },
+          "current_value_base_currency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Currency-Output"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Current market value converted to user's base currency"
+          },
           "unrealized_pnl": {
             "anyOf": [
               {
@@ -4449,6 +4492,17 @@
               }
             ],
             "description": "Unrealized profit/loss"
+          },
+          "unrealized_pnl_base_currency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Currency-Output"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Unrealized P&L converted to user's base currency"
           },
           "unrealized_pnl_percent": {
             "anyOf": [

@@ -282,25 +282,25 @@ def _resolve_windows_command(cmd: list, env: dict) -> list:
 def run_pipenv(args: list, cwd: Optional[Path] = None, env: Optional[dict] = None) -> int:
     """Run a command inside the project Python environment."""
     project_root = get_project_root()
-    venv_scripts = project_root / "venv" / "Scripts"
+    venv_candidates = [
+        project_root / "venv" / "Scripts",
+        project_root / ".venv" / "Scripts",
+    ]
     full_env = os.environ.copy()
     if env:
         full_env.update(env)
-
-    if venv_scripts.exists():
-        full_env["PATH"] = str(venv_scripts) + os.pathsep + full_env.get("PATH", "")
-        resolved_args = list(args)
-        if resolved_args and resolved_args[0] == "python":
-            resolved_args[0] = sys.executable
-        return run_command_live(resolved_args, cwd=cwd, env=full_env)
-
-    if shutil.which("pipenv", path=full_env.get("PATH")):
-        return run_command_live(["pipenv", "run"] + args, cwd=cwd, env=full_env)
 
     resolved_args = list(args)
     if resolved_args and resolved_args[0] == "python":
         resolved_args[0] = sys.executable
 
+    for venv_scripts in venv_candidates:
+        if venv_scripts.exists():
+            full_env["PATH"] = str(venv_scripts) + os.pathsep + full_env.get("PATH", "")
+            return run_command_live(resolved_args, cwd=cwd, env=full_env)
+
+    # Fallback: use the current interpreter/environment directly.
+    # Avoid auto-switching to pipenv, which can select a mismatched Python version.
     return run_command_live(resolved_args, cwd=cwd, env=full_env)
 
 

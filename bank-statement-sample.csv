@@ -1,0 +1,21 @@
+﻿Date,Description,Category,Debit,Credit,Balance
+2026-05-01,Salary Credit,Income,0,85000,125000
+2026-05-02,Groceries - SuperMart,Groceries,2450,0,122550
+2026-05-03,Uber Ride,Transport,380,0,122170
+2026-05-04,Electricity Bill,Utilities,2150,0,120020
+2026-05-05,Restaurant Dinner,Food,1850,0,118170
+2026-05-06,ATM Cash Withdrawal,Cash,5000,0,113170
+2026-05-07,Online Shopping,Shopping,3200,0,109970
+2026-05-08,Interest Credit,Income,0,420,110390
+2026-05-09,Pharmacy,Healthcare,760,0,109630
+2026-05-10,Movie Tickets,Entertainment,900,0,108730
+2026-05-11,Fuel Station,Transport,2100,0,106630
+2026-05-12,Freelance Payment,Income,0,15000,121630
+2026-05-13,Mobile Recharge,Utilities,699,0,120931
+2026-05-14,Coffee Shop,Food,290,0,120641
+2026-05-15,Rent Payment,Housing,25000,0,95641
+2026-05-16,Water Bill,Utilities,540,0,95101
+2026-05-17,Gym Membership,Health,1800,0,93301
+2026-05-18,Book Store,Education,1250,0,92051
+2026-05-19,Dividend Credit,Income,0,980,93031
+2026-05-20,Insurance Premium,Insurance,4500,0,88531

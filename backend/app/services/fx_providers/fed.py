@@ -66,6 +66,15 @@ class FEDProvider(FXRateProvider):
         "THB": "DEXTHUS",  # Thai Baht (USD per THB)
         }
 
+    def _is_usd_per_foreign_series(self, series_id: str) -> bool:
+        """
+        Determine FRED series orientation.
+
+        - DEXUSXX -> USD per 1 foreign currency (e.g., DEXUSEU)
+        - DEXXXUS -> foreign currency per 1 USD (e.g., DEXINUS)
+        """
+        return series_id.startswith("DEXUS")
+
     @property
     def code(self) -> str:
         return "FED"
@@ -181,7 +190,9 @@ class FEDProvider(FXRateProvider):
                     response.raise_for_status()
 
                     # Parse CSV with date range filter
-                    observations = self._parse_csv(response.text, currency, start_date, end_date)
+                    observations = self._parse_csv(
+                        response.text, currency, series_id, start_date, end_date
+                    )
                     results[currency] = observations
 
             except httpx.HTTPError as e:
@@ -196,7 +207,7 @@ class FEDProvider(FXRateProvider):
         return results
 
     def _parse_csv(
-        self, csv_text: str, currency: str, start_date: date, end_date: date
+        self, csv_text: str, currency: str, series_id: str, start_date: date, end_date: date
         ) -> list[tuple[date, str, str, Decimal]]:
         """
         Parse FRED CSV response.
@@ -254,11 +265,6 @@ class FEDProvider(FXRateProvider):
                 if value_str in [".", "", "ND"]:
                     continue
 
-                # FRED gives: USD per 1 foreign currency (ALL currencies per 1 unit)
-                # Example: DEXUSEU = 1.0850 means 1 EUR = 1.0850 USD
-                # Example: DEXJPUS = 0.0067 means 1 JPY = 0.0067 USD (NOT per 100!)
-                # Return as provided: (date, quote_currency, base_currency, rate)
-                # Note: FRED quotes backwards (foreign/USD not USD/foreign)
                 fred_rate = Decimal(value_str)
 
                 # Skip zero rates to avoid division by zero
@@ -268,10 +274,12 @@ class FEDProvider(FXRateProvider):
                     logger.warning(f"Skipping zero rate for {currency} on {rate_date}")
                     continue
 
-                # FRED quotes as: 1 foreign_currency = fred_rate USD
-                # Return tuple: (date, base=foreign, quote=USD, rate)
-                # Example: 1 EUR = 1.08 USD → (date, 'EUR', 'USD', 1.08)
-                observations.append((rate_date, currency, self.base_currency, fred_rate))
+                if self._is_usd_per_foreign_series(series_id):
+                    # DEXUSXX: 1 foreign = rate USD (e.g. 1 EUR = 1.08 USD)
+                    observations.append((rate_date, currency, self.base_currency, fred_rate))
+                else:
+                    # DEXXXUS: 1 USD = rate foreign (e.g. 1 USD = 83 INR)
+                    observations.append((rate_date, self.base_currency, currency, fred_rate))
 
             except (ValueError, IndexError, ZeroDivisionError) as e:
                 logger.debug(f"Skipping invalid line in FRED CSV: {line[:50]}... ({e})")

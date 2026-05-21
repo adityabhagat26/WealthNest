@@ -208,6 +208,12 @@ type BRAssetHolding = {
    */
   quantity: string;
   total_cost: Currency_Output;
+  total_cost_base_currency?:
+    | /**
+     * Total cost converted to user's base currency
+     */
+    ((Currency_Output | null) | Array<Currency_Output | null>)
+    | undefined;
   /**
    * Average cost per unit
    *
@@ -236,9 +242,21 @@ type BRAssetHolding = {
      */
     ((Currency_Output | null) | Array<Currency_Output | null>)
     | undefined;
+  current_value_base_currency?:
+    | /**
+     * Current market value converted to user's base currency
+     */
+    ((Currency_Output | null) | Array<Currency_Output | null>)
+    | undefined;
   unrealized_pnl?:
     | /**
      * Unrealized profit/loss
+     */
+    ((Currency_Output | null) | Array<Currency_Output | null>)
+    | undefined;
+  unrealized_pnl_base_currency?:
+    | /**
+     * Unrealized P&L converted to user's base currency
      */
     ((Currency_Output | null) | Array<Currency_Output | null>)
     | undefined;
@@ -5106,6 +5124,10 @@ Examples:
 
 Raises:
     ValueError: If currency code is not valid ISO 4217 or supported crypto`),
+  total_cost_base_currency: z
+    .union([Currency_Output, z.null()])
+    .describe("Total cost converted to user's base currency")
+    .optional(),
   average_cost_per_unit: z
     .string()
     .regex(/^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$/)
@@ -5118,9 +5140,17 @@ Raises:
     .union([Currency_Output, z.null()])
     .describe("Current market value")
     .optional(),
+  current_value_base_currency: z
+    .union([Currency_Output, z.null()])
+    .describe("Current market value converted to user's base currency")
+    .optional(),
   unrealized_pnl: z
     .union([Currency_Output, z.null()])
     .describe("Unrealized profit/loss")
+    .optional(),
+  unrealized_pnl_base_currency: z
+    .union([Currency_Output, z.null()])
+    .describe("Unrealized P&L converted to user's base currency")
     .optional(),
   unrealized_pnl_percent: z
     .union([z.string(), z.null()])
@@ -7327,6 +7357,18 @@ Returns plugin metadata including code, name, description,
 and supported file extensions.`,
     requestFormat: "json",
     response: z.array(BRIMPluginInfo),
+  },
+  {
+    method: "get",
+    path: "/api/v1/brokers/import/sample-reports/coinbase-add-assets",
+    alias:
+      "download_coinbase_sample_report_api_v1_brokers_import_sample_reports_coinbase_add_assets_get",
+    description: `Download a ready-to-import Coinbase sample CSV.
+
+Useful for quickly testing asset import flow.
+Requires authentication.`,
+    requestFormat: "json",
+    response: z.unknown(),
   },
   {
     method: "post",

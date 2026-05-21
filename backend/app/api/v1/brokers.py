@@ -29,7 +29,6 @@ Provides RESTful endpoints for broker report file management and parsing:
 from typing import Annotated, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
-from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.api.v1.auth import get_current_user
@@ -69,7 +68,6 @@ logger = get_logger(__name__)
 broker_router = APIRouter(prefix="/brokers", tags=["BR (Broker)"])
 
 brim_router = APIRouter(prefix="/import", tags=["BR Import"])
-
 
 # =============================================================================
 # CREATE

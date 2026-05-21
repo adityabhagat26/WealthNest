@@ -17,10 +17,11 @@ Design Notes:
 
 from __future__ import annotations
 
+from datetime import date as date_type
 from decimal import Decimal
 from typing import List, Literal, Optional, Union
 
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, delete as sql_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.db.models import (
@@ -449,10 +450,28 @@ class BrokerService:
                 user_role_value = user_access.role.value
                 user_share_value = user_access.share_percentage
 
+        user_settings = await get_or_create_user_settings(effective_user_id, self.session)
+        base_currency = user_settings.base_currency
+        valuation_date = today_date()
+
+        for holding in holdings:
+            holding.total_cost_base_currency = await self._convert_currency_value(
+                holding.total_cost, base_currency, valuation_date
+            )
+            if holding.current_value is not None:
+                holding.current_value_base_currency = await self._convert_currency_value(
+                    holding.current_value, base_currency, valuation_date
+                )
+            if holding.unrealized_pnl is not None:
+                holding.unrealized_pnl_base_currency = await self._convert_currency_value(
+                    holding.unrealized_pnl, base_currency, valuation_date
+                )
+
         total_value_base_currency = await self._compute_total_value_in_base_currency(
             cash_balances=cash_balances,
             holdings=holdings,
-            user_id=effective_user_id,
+            base_currency=base_currency,
+            valuation_date=valuation_date,
         )
 
         return BRSummary(
@@ -491,18 +510,16 @@ class BrokerService:
         self,
         cash_balances: List[Currency],
         holdings: List[BRAssetHolding],
-        user_id: int,
+        base_currency: str,
+        valuation_date: date_type,
     ) -> Optional[Currency]:
         """
         Aggregate broker cash + holdings into the user's base currency.
 
         Returns None if nothing can be valued.
         """
-        user_settings = await get_or_create_user_settings(user_id, self.session)
-        base_currency = user_settings.base_currency
         total_value = Decimal("0")
         has_valued_component = False
-        valuation_date = today_date()
 
         for cash in cash_balances:
             converted = await self._convert_currency_value(cash, base_currency, valuation_date)
@@ -512,6 +529,11 @@ class BrokerService:
             has_valued_component = True
 
         for holding in holdings:
+            if holding.current_value_base_currency is not None:
+                total_value += holding.current_value_base_currency.amount
+                has_valued_component = True
+                continue
+
             if holding.current_value is None:
                 continue
             converted = await self._convert_currency_value(
@@ -778,6 +800,12 @@ class BrokerService:
                 if tx_count > 0 and item.force:
                     transactions_deleted = await self.tx_service.delete_by_broker(item.id)
                     await self.session.flush()
+
+                # Remove broker access rows first (no FK cascade configured)
+                await self.session.execute(
+                    sql_delete(BrokerUserAccess).where(BrokerUserAccess.broker_id == item.id)
+                )
+                await self.session.flush()
 
                 # Delete broker
                 await self.session.delete(broker)

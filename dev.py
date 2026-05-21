@@ -194,6 +194,8 @@ def cmd_server(args):
         env["WEALTHNEST_LOG_LEVEL"] = "DEBUG"
 
     return run_pipenv([
+        "python",
+        "-m",
         "uvicorn",
         "backend.app.main:app",
         "--reload",
@@ -412,14 +414,14 @@ def cmd_mkdocs_build(args):
     """Build MkDocs documentation."""
     print(Colors.success("Building MkDocs site..."))
     copy_docs_assets()
-    return run_pipenv(["mkdocs", "build", "-f", "mkdocs_src/mkdocs.yml"])
+    return run_pipenv(["python", "-m", "mkdocs", "build", "-f", "mkdocs_src/mkdocs.yml"])
 
 
 def cmd_mkdocs_serve(args):
     """Serve MkDocs documentation locally."""
     print(Colors.success("Serving MkDocs site (http://127.0.0.1:8002)"))
     copy_docs_assets()
-    return run_pipenv(["mkdocs", "serve", "-f", "mkdocs_src/mkdocs.yml", "-a", "127.0.0.1:8002"])
+    return run_pipenv(["python", "-m", "mkdocs", "serve", "-f", "mkdocs_src/mkdocs.yml", "-a", "127.0.0.1:8002"])
 
 
 def cmd_mkdocs_clean(args):
@@ -437,7 +439,7 @@ def cmd_mkdocs_deploy(args):
     """Deploy MkDocs to GitHub Pages."""
     print(Colors.success("Deploying MkDocs site to GitHub Pages..."))
     copy_docs_assets()
-    return run_pipenv(["mkdocs", "gh-deploy", "-f", "mkdocs_src/mkdocs.yml"])
+    return run_pipenv(["python", "-m", "mkdocs", "gh-deploy", "-f", "mkdocs_src/mkdocs.yml"])
 
 
 def cmd_mkdocs_gallery(args):
@@ -637,7 +639,7 @@ def auto_build_mkdocs():
     if not site_dir.exists() or not (site_dir / "index.html").exists():
         print(Colors.info("📚 Documentation build missing, building..."))
         copy_docs_assets()
-        run_pipenv(["mkdocs", "build", "-f", "mkdocs_src/mkdocs.yml"])
+        run_pipenv(["python", "-m", "mkdocs", "build", "-f", "mkdocs_src/mkdocs.yml"])
         return
 
     try:
@@ -646,7 +648,7 @@ def auto_build_mkdocs():
             if doc_file.stat().st_mtime > build_time:
                 print(Colors.info("📚 Documentation changed, rebuilding..."))
                 copy_docs_assets()
-                run_pipenv(["mkdocs", "build", "-f", "mkdocs_src/mkdocs.yml"])
+                run_pipenv(["python", "-m", "mkdocs", "build", "-f", "mkdocs_src/mkdocs.yml"])
                 return
     except Exception:
         pass
