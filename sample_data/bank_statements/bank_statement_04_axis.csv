@@ -1,0 +1,11 @@
+﻿date,description,debit,credit,balance,currency,reference,category
+2025-01-04,Salary Credit,,70500.00,110230.60,INR,SALJAN,Income
+2025-01-08,UPI Milk & Daily Needs,560.00,,109670.60,INR,UPI998101,Groceries
+2025-01-11,School Fees,6500.00,,103170.60,INR,NEFTSCH01,Education
+2025-01-16,Credit Card Bill Payment,9200.00,,93970.60,INR,CCPAY021,CreditCard
+2025-01-20,UPI Pharmacy,740.00,,93230.60,INR,UPI447121,Health
+2025-01-27,Restaurant Family Dinner,2150.00,,91080.60,INR,POS90121,Dining
+2025-01-31,Interest Credit,,121.55,91202.15,INR,INTJAN,Interest
+2025-02-04,Salary Credit,,70500.00,161702.15,INR,SALFEB,Income
+2025-02-09,Rent Transfer,20000.00,,141702.15,INR,NEFTRENT,Housing
+2025-02-23,UPI Supermarket,2650.80,,139051.35,INR,UPI119903,Groceries

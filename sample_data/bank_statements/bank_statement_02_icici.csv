@@ -1,0 +1,11 @@
+﻿date,description,debit,credit,balance,currency,reference,category
+2025-01-03,Salary Credit,,65500.00,95220.10,INR,SALJAN,Income
+2025-01-06,UPI Fuel Station,2200.00,,93020.10,INR,UPI443211,Transport
+2025-01-09,Internet Bill,999.00,,92021.10,INR,BILL8812,Utilities
+2025-01-13,EMI Personal Loan,8450.00,,83571.10,INR,EMI11234,Loan
+2025-01-18,UPI Pharmacy,685.00,,82886.10,INR,UPI882771,Health
+2025-01-25,Movie + Snacks,940.00,,81946.10,INR,POS55812,Entertainment
+2025-01-31,Savings Interest,,98.65,82044.75,INR,INTJAN,Interest
+2025-02-03,Salary Credit,,65500.00,147544.75,INR,SALFEB,Income
+2025-02-11,Rent Transfer,18000.00,,129544.75,INR,NEFT1800,Housing
+2025-02-22,UPI Grocery DMart,3125.50,,126419.25,INR,UPI441199,Groceries

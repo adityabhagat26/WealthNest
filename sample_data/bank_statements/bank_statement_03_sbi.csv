@@ -1,0 +1,11 @@
+﻿date,description,debit,credit,balance,currency,reference,category
+2025-01-01,Opening Balance,,,45210.00,INR,OPENING,Balance
+2025-01-05,Freelance Payment,,18500.00,63710.00,INR,IMPS77812,Income
+2025-01-07,UPI Food Delivery,620.00,,63090.00,INR,UPI980712,Dining
+2025-01-10,UPI Cab Ride,430.00,,62660.00,INR,UPI901233,Transport
+2025-01-14,Health Insurance Premium,3550.00,,59110.00,INR,INS45811,Insurance
+2025-01-21,Electricity Bill,1675.00,,57435.00,INR,BILL9911,Utilities
+2025-01-28,UPI Coffee Shop,320.00,,57115.00,INR,UPI200311,Dining
+2025-02-04,Freelance Payment,,21000.00,78115.00,INR,IMPS88412,Income
+2025-02-12,SIP Auto-Debit,3000.00,,75115.00,INR,SIP4412,Investment
+2025-02-25,Grocery Store,1840.00,,73275.00,INR,POS11287,Groceries

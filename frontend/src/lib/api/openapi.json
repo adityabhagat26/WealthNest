@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "WealthNest",
-    "version": "v0.0.0-ge5be973-dirty"
+    "version": "v0.0.0-g1bc8670-dirty"
   },
   "paths": {
     "/api/v1/auth/login": {

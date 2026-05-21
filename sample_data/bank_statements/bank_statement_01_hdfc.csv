@@ -1,0 +1,11 @@
+﻿date,description,debit,credit,balance,currency,reference,category
+2025-01-02,Salary Credit,,78000.00,120450.25,INR,SALJAN25,Income
+2025-01-04,UPI Grocery BigBasket,2450.75,,117999.50,INR,UPI983421,Groceries
+2025-01-08,Electricity Bill,1980.00,,116019.50,INR,BILL672131,Utilities
+2025-01-12,SIP Auto-Debit Mutual Fund,5000.00,,111019.50,INR,SIP90812,Investment
+2025-01-19,ATM Withdrawal,3000.00,,108019.50,INR,ATM22341,Cash
+2025-01-24,Restaurant Payment,1265.00,,106754.50,INR,POS98231,Dining
+2025-01-29,Interest Credit,,132.40,106886.90,INR,INTJAN25,Interest
+2025-02-02,Salary Credit,,78000.00,184886.90,INR,SALFEB25,Income
+2025-02-10,Rent Transfer,22000.00,,162886.90,INR,NEFTRENT02,Housing
+2025-02-26,Mobile Recharge,799.00,,162087.90,INR,UPI781244,Utilities

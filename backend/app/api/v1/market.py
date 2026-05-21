@@ -32,6 +32,28 @@ def _normalize_symbol_for_nse(symbol: str) -> str:
     return f"{cleaned}.NS"
 
 
+def _rows_to_points(hist_df):
+    """Convert yfinance/pandas history rows to API point payload."""
+    if hist_df is None or getattr(hist_df, "empty", True):
+        return []
+    points = []
+    for idx, row in hist_df.iterrows():
+        close_value = row.get("Close")
+        if close_value is None:
+            continue
+        try:
+            date_value = idx.date().isoformat()
+        except Exception:
+            date_value = str(idx)[:10]
+        points.append(
+            {
+                "date": date_value,
+                "close": float(close_value),
+            }
+        )
+    return points
+
+
 @market_router.get("/yahoo/quote/{symbol}")
 async def get_yahoo_quote(symbol: str):
     """
@@ -102,26 +124,52 @@ async def get_yahoo_history(
             raise RuntimeError("yfinance library unavailable")
 
         ticker = yf.Ticker(resolved_symbol)
-        hist_df = ticker.history(period=f"{period_days}d")
-        if hist_df.empty:
-            return {
-                "symbol": resolved_symbol,
-                "currency": "INR",
-                "points": [],
-                "source": "Yahoo Finance",
-            }
+        points = []
 
-        points = [
-            {
-                "date": idx.date().isoformat(),
-                "close": float(row["Close"]),
-            }
-            for idx, row in hist_df.iterrows()
-            if row.get("Close") is not None
-        ]
-        currency = None
+        # Strategy 1: explicit date range
         try:
-            currency = ticker.fast_info.get("currency")
+            range_df = ticker.history(
+                start=start_date.isoformat(),
+                end=(end_date + timedelta(days=1)).isoformat(),
+                interval="1d",
+                auto_adjust=False,
+                actions=False,
+            )
+            points = _rows_to_points(range_df)
+        except Exception:
+            points = []
+
+        # Strategy 2: period based
+        if len(points) < 2:
+            try:
+                period_df = ticker.history(
+                    period=f"{period_days}d",
+                    interval="1d",
+                    auto_adjust=False,
+                    actions=False,
+                )
+                points = _rows_to_points(period_df)
+            except Exception:
+                points = []
+
+        # Strategy 3: global downloader fallback
+        if len(points) < 2:
+            try:
+                download_df = yf.download(
+                    tickers=resolved_symbol,
+                    period=f"{period_days}d",
+                    interval="1d",
+                    auto_adjust=False,
+                    progress=False,
+                    threads=False,
+                )
+                points = _rows_to_points(download_df)
+            except Exception:
+                points = []
+
+        currency = "INR"
+        try:
+            currency = ticker.fast_info.get("currency") or "INR"
         except Exception:
             currency = "INR"
 

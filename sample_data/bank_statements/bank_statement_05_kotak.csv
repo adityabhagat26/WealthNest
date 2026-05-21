@@ -1,0 +1,11 @@
+﻿date,description,debit,credit,balance,currency,reference,category
+2025-01-03,Salary Credit,,88200.00,142880.90,INR,SALJAN,Income
+2025-01-07,UPI Grocery Reliance Fresh,2980.00,,139900.90,INR,UPI11782,Groceries
+2025-01-12,Home Internet Bill,1199.00,,138701.90,INR,BILL77891,Utilities
+2025-01-15,SIP Auto-Debit Equity Fund,8000.00,,130701.90,INR,SIP77611,Investment
+2025-01-18,Flight Booking,6450.00,,124251.90,INR,POSAIR22,Travel
+2025-01-22,UPI Coffee & Snacks,485.00,,123766.90,INR,UPI66112,Dining
+2025-01-30,Tax Refund,,2450.00,126216.90,INR,REFUND25,Refund
+2025-02-03,Salary Credit,,88200.00,214416.90,INR,SALFEB,Income
+2025-02-14,Rent Transfer,26000.00,,188416.90,INR,NEFTRENT02,Housing
+2025-02-24,UPI Medical Store,1325.00,,187091.90,INR,UPI74219,Health
