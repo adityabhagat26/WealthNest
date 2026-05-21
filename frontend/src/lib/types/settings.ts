@@ -50,4 +50,4 @@ export type Theme = 'light' | 'dark' | 'auto';
 /**
  * Supported locales for i18n.
  */
-export type SupportedLocale = 'en' | 'it' | 'fr' | 'es';
+export type SupportedLocale = 'en' | 'hi';

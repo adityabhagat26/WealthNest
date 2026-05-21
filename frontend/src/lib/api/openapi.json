@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "WealthNest",
-    "version": "v0.0.0-gcaecd48-dirty"
+    "version": "v0.0.0-g6ee1d66-dirty"
   },
   "paths": {
     "/api/v1/auth/login": {
@@ -895,6 +895,69 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserSearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/banking/statements/preview": {
+      "post": {
+        "tags": [
+          "Banking"
+        ],
+        "summary": "Preview Bank Statement",
+        "operationId": "preview_bank_statement_api_v1_banking_statements_preview_post",
+        "parameters": [
+          {
+            "name": "bank_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "My Bank",
+              "title": "Bank Name"
+            }
+          },
+          {
+            "name": "account_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Primary Account",
+              "title": "Account Name"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_preview_bank_statement_api_v1_banking_statements_preview_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankStatementSummaryResponse"
                 }
               }
             }
@@ -3235,27 +3298,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/brokers/import/sample-reports/coinbase-add-assets": {
-      "get": {
-        "tags": [
-          "BR (Broker)",
-          "BR Import"
-        ],
-        "summary": "Download Coinbase Sample Report",
-        "description": "Download a ready-to-import Coinbase sample CSV.\n\nUseful for quickly testing asset import flow.\nRequires authentication.",
-        "operationId": "download_coinbase_sample_report_api_v1_brokers_import_sample_reports_coinbase_add_assets_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           }
@@ -5827,6 +5869,100 @@
         ],
         "title": "BackwardFillInfo",
         "description": "Backward-fill information when requested date has no data.\n\nUsed by both FX (fx.py) and Asset pricing (asset_source.py) systems\nto indicate when historical data was used instead of exact date match.\n\nAttributes:\n    actual_rate_date: stored as a `date` (accepts ISO string, `date` or `datetime` on input)\n    days_back: Number of days back from requested date\n\nExamples:\n    # Exact match - backward_fill_info is None\n    {\n        \"date\": \"2025-11-05\",\n        \"value\": 1.234,\n        \"backward_fill_info\": None\n    }\n\n    # Backfilled - used data from 3 days earlier\n    {\n        \"date\": \"2025-11-05\",\n        \"value\": 1.234,\n        \"backward_fill_info\": {\n            \"actual_rate_date\": \"2025-11-02\",\n            \"days_back\": 3\n        }\n    }"
+      },
+      "BankCategorySummary": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "total_expense": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Expense"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "total_expense"
+        ],
+        "title": "BankCategorySummary"
+      },
+      "BankStatementSummaryResponse": {
+        "properties": {
+          "bank_name": {
+            "type": "string",
+            "title": "Bank Name"
+          },
+          "account_name": {
+            "type": "string",
+            "title": "Account Name"
+          },
+          "rows_processed": {
+            "type": "integer",
+            "title": "Rows Processed"
+          },
+          "total_expense": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Expense"
+          },
+          "total_income": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Income"
+          },
+          "net_change": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Net Change"
+          },
+          "current_balance": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Balance"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/BankCategorySummary"
+            },
+            "type": "array",
+            "title": "Categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bank_name",
+          "account_name",
+          "rows_processed",
+          "total_expense",
+          "total_income",
+          "net_change"
+        ],
+        "title": "BankStatementSummaryResponse"
+      },
+      "Body_preview_bank_statement_api_v1_banking_statements_preview_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "description": "Bank statement in CSV format"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_preview_bank_statement_api_v1_banking_statements_preview_post"
       },
       "Body_upload_file_api_v1_brokers_import_upload_post": {
         "properties": {

@@ -68,7 +68,7 @@ function createAuthStore() {
 
                     // Apply language preference
                     if (settings.language) {
-                        currentLanguage.set(settings.language as 'en' | 'it' | 'fr' | 'es');
+                        currentLanguage.set(settings.language as 'en' | 'hi');
                     }
 
                     // Apply theme preference

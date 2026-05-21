@@ -988,6 +988,45 @@ type BRSummary = {
     ((Currency_Output | null) | Array<Currency_Output | null>)
     | undefined;
 };
+type BankStatementSummaryResponse = {
+  bank_name: string;
+  account_name: string;
+  rows_processed: number;
+  /**
+   * @pattern ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+   */
+  total_expense: string;
+  /**
+   * @pattern ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+   */
+  total_income: string;
+  /**
+   * @pattern ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+   */
+  net_change: string;
+  current_balance?:
+    | (
+        | /**
+         * @pattern ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+         */
+        (string | null)
+        | Array<
+            /**
+             * @pattern ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+             */
+            string | null
+          >
+      )
+    | undefined;
+  categories?: Array<BankCategorySummary> | undefined;
+};
+type BankCategorySummary = {
+  category: string;
+  /**
+   * @pattern ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+   */
+  total_expense: string;
+};
 type CountryListResponse = {
   items?: /**
    * List of items
@@ -3375,6 +3414,27 @@ const UserSearchItem: z.ZodType<UserSearchItem> = z.object({
 const UserSearchResponse: z.ZodType<UserSearchResponse> = z
   .object({ items: z.array(UserSearchItem).describe("List of items") })
   .partial();
+const Body_preview_bank_statement_api_v1_banking_statements_preview_post = z
+  .object({ file: z.string().describe("Bank statement in CSV format") })
+  .passthrough();
+const BankCategorySummary: z.ZodType<BankCategorySummary> = z
+  .object({
+    category: z.string(),
+    total_expense: z.string().regex(/^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$/),
+  })
+  .passthrough();
+const BankStatementSummaryResponse: z.ZodType<BankStatementSummaryResponse> = z
+  .object({
+    bank_name: z.string(),
+    account_name: z.string(),
+    rows_processed: z.number().int(),
+    total_expense: z.string().regex(/^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$/),
+    total_income: z.string().regex(/^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$/),
+    net_change: z.string().regex(/^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$/),
+    current_balance: z.union([z.string(), z.null()]).optional(),
+    categories: z.array(BankCategorySummary).optional(),
+  })
+  .passthrough();
 const FXProviderInfo = z
   .object({
     code: z.string().describe("Provider code (e.g., ECB, FED, BOE, SNB)"),
@@ -5752,6 +5812,9 @@ export const schemas = {
   exclude_broker_id,
   UserSearchItem,
   UserSearchResponse,
+  Body_preview_bank_statement_api_v1_banking_statements_preview_post,
+  BankCategorySummary,
+  BankStatementSummaryResponse,
   FXProviderInfo,
   FXPairSourceItem,
   FXPairSourcesResponse,
@@ -6869,6 +6932,39 @@ Returns current implementation status.`,
   },
   {
     method: "post",
+    path: "/api/v1/banking/statements/preview",
+    alias: "preview_bank_statement_api_v1_banking_statements_preview_post",
+    requestFormat: "form-data",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z
+          .object({ file: z.string().describe("Bank statement in CSV format") })
+          .passthrough(),
+      },
+      {
+        name: "bank_name",
+        type: "Query",
+        schema: z.string().optional().default("My Bank"),
+      },
+      {
+        name: "account_name",
+        type: "Query",
+        schema: z.string().optional().default("Primary Account"),
+      },
+    ],
+    response: BankStatementSummaryResponse,
+    errors: [
+      {
+        status: 422,
+        description: `Validation Error`,
+        schema: HTTPValidationError,
+      },
+    ],
+  },
+  {
+    method: "post",
     path: "/api/v1/brokers",
     alias: "create_brokers_api_v1_brokers_post",
     description: `Create multiple brokers.
@@ -7357,18 +7453,6 @@ Returns plugin metadata including code, name, description,
 and supported file extensions.`,
     requestFormat: "json",
     response: z.array(BRIMPluginInfo),
-  },
-  {
-    method: "get",
-    path: "/api/v1/brokers/import/sample-reports/coinbase-add-assets",
-    alias:
-      "download_coinbase_sample_report_api_v1_brokers_import_sample_reports_coinbase_add_assets_get",
-    description: `Download a ready-to-import Coinbase sample CSV.
-
-Useful for quickly testing asset import flow.
-Requires authentication.`,
-    requestFormat: "json",
-    response: z.unknown(),
   },
   {
     method: "post",

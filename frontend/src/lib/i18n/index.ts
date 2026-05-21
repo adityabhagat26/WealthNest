@@ -1,7 +1,7 @@
 /**
  * i18n Configuration for WealthNest
  *
- * Supported languages: English, Italian, French, Spanish
+ * Supported languages: English, Hindi
  * Uses svelte-i18n for internationalization
  */
 import {browser} from '$app/environment';
@@ -9,12 +9,10 @@ import {getLocaleFromNavigator, init, register} from 'svelte-i18n';
 
 // Register language files
 register('en', () => import('./en.json'));
-register('it', () => import('./it.json'));
-register('fr', () => import('./fr.json'));
-register('es', () => import('./es.json'));
+register('hi', () => import('./hi.json'));
 
 // Supported locales
-export const SUPPORTED_LOCALES = ['en', 'it', 'fr', 'es'] as const;
+export const SUPPORTED_LOCALES = ['en', 'hi'] as const;
 export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 
 // Default locale
@@ -23,17 +21,13 @@ export const DEFAULT_LOCALE: SupportedLocale = 'en';
 // Locale display names (in their own language)
 export const LOCALE_NAMES: Record<SupportedLocale, string> = {
     en: 'English',
-    it: 'Italiano',
-    fr: 'Français',
-    es: 'Español'
+    hi: 'Hindi'
 };
 
 // Locale flags (emoji)
 export const LOCALE_FLAGS: Record<SupportedLocale, string> = {
     en: '🇬🇧',
-    it: '🇮🇹',
-    fr: '🇫🇷',
-    es: '🇪🇸'
+    hi: '🇮🇳'
 };
 
 /**
