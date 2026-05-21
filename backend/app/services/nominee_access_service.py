@@ -151,7 +151,7 @@ async def build_nominee_access_context(
         cash_rows = [
             {"currency": currency, "amount": str(amount)}
             for currency, amount in cash_rows_result.all()
-            if currency is not None and amount is not None and amount != 0
+            if currency is not None and amount is not None
         ]
         banking_details.append(
             {
@@ -172,7 +172,7 @@ async def build_nominee_access_context(
     account_cash_totals = [
         {"currency": currency, "amount": str(amount)}
         for currency, amount in account_cash_totals_result.all()
-        if currency is not None and amount is not None and amount != 0
+        if currency is not None and amount is not None
     ]
 
     holdings_result = await session.execute(

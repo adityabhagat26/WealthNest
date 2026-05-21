@@ -5,7 +5,7 @@
     import {_} from '$lib/i18n';
     import {auth} from '$lib/stores/auth';
     import {userSettings} from '$lib/stores/settings';
-    import {ArrowRightLeft, BarChart3, BellRing, Briefcase, Building2, Coins, Files, LayoutDashboard, LogOut, Settings, User, X} from 'lucide-svelte';
+    import {ArrowRightLeft, BarChart3, BellRing, Briefcase, Building2, Coins, Files, LayoutDashboard, LogOut, Settings, TrendingUp, User, X} from 'lucide-svelte';
     import {APP_VERSION} from '$lib/version';
 
     // Mobile sidebar state (exported so parent can control it)
@@ -39,6 +39,7 @@
     // Group 2: Market Data (global/shared data)
     const marketDataItems = [
         {href: '/assets', icon: BarChart3, labelKey: 'nav.assets'},
+        {href: '/market-live', icon: TrendingUp, labelKey: 'nav.marketLive'},
         {href: '/fx', icon: Coins, labelKey: 'nav.fx'},
         {href: '/banking', icon: Building2, labelKey: 'nav.banking'}
     ];

@@ -8,15 +8,25 @@ Supports both current values and historical OHLC (Open, High, Low, Close) data.
 # Postpones evaluation of type hints to improve imports and performance. Also avoid circular import issues.
 from __future__ import annotations
 
+import os
 from datetime import date, timedelta
+from pathlib import Path
 from decimal import Decimal
 from typing import Dict
 
+from backend.app.config import get_data_dir
 from backend.app.db import IdentifierType
 from backend.app.logging_config import get_logger
 from backend.app.utils.cache_utils import get_ttl_cache
 
 try:
+    # yfinance uses a local timezone cache DB; on some Windows setups it may try
+    # to write in a restricted location and fail with "unable to open database file".
+    # Force cache into WealthNest writable data dir.
+    tz_cache_dir = Path(get_data_dir()) / "yfinance_tz_cache"
+    tz_cache_dir.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault("YFINANCE_TZ_CACHE_LOCATION", str(tz_cache_dir))
+
     import yfinance as yf
     import pandas as pd
 

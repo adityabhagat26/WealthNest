@@ -7971,6 +7971,62 @@ Returns:
   },
   {
     method: "get",
+    path: "/api/v1/market/yahoo/history/:symbol",
+    alias: "get_yahoo_history_api_v1_market_yahoo_history__symbol__get",
+    description: `Fetch historical close prices for a symbol from Yahoo Finance.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "symbol",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "period_days",
+        type: "Query",
+        schema: z
+          .number()
+          .int()
+          .gte(7)
+          .lte(730)
+          .describe("Number of days back from today")
+          .optional()
+          .default(90),
+      },
+    ],
+    response: z.unknown(),
+    errors: [
+      {
+        status: 422,
+        description: `Validation Error`,
+        schema: HTTPValidationError,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/v1/market/yahoo/quote/:symbol",
+    alias: "get_yahoo_quote_api_v1_market_yahoo_quote__symbol__get",
+    description: `Fetch latest quote for a symbol from Yahoo Finance.`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "symbol",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.unknown(),
+    errors: [
+      {
+        status: 422,
+        description: `Validation Error`,
+        schema: HTTPValidationError,
+      },
+    ],
+  },
+  {
+    method: "get",
     path: "/api/v1/nominee/access",
     alias: "get_nominee_access_api_v1_nominee_access_get",
     description: `Resolve a nominee token into a restricted read-only account summary.`,

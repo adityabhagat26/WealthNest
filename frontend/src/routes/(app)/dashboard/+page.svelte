@@ -92,6 +92,7 @@
         }
     }
 
+
     function formatCurrency(amount: number, currency = baseCurrency): string {
         return new Intl.NumberFormat(undefined, {
             style: 'currency',
@@ -490,6 +491,7 @@
             </div>
         </article>
     </section>
+
 </div>
 
 <style>
@@ -901,6 +903,7 @@
         background: linear-gradient(180deg, rgba(69, 10, 10, 0.52), rgba(31, 13, 18, 0.88));
     }
 
+
     .error-panel h3,
     .error-panel p {
         margin: 0;
@@ -920,6 +923,7 @@
         .stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+
     }
 
     @media (max-width: 760px) {
