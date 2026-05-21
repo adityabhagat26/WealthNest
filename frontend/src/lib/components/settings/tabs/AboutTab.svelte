@@ -5,8 +5,8 @@
     import {Check, Copy, ExternalLink, Github, Globe, HardDrive, Heart, Monitor, Scale, Tag} from 'lucide-svelte';
     import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
 
-    const githubUrl = 'https://github.com/Alfystar/LibreFolio';
-    const websiteUrl = 'https://librefolio.io'; // Placeholder for now
+    const githubUrl = 'https://github.com/Alfystar/WealthNest';
+    const websiteUrl = 'https://wealthnest.io'; // Placeholder for now
 
     interface DependencyInfo {
         name: string;
@@ -40,7 +40,7 @@
     async function copySystemInfo() {
         if (!systemInfo) return;
 
-        const info = `LibreFolio System Info
+        const info = `WealthNest System Info
 ========================
 App Version: ${systemInfo.app_version}
 Python: ${systemInfo.python_version}
@@ -66,10 +66,10 @@ Generated: ${new Date().toISOString()}
     <!-- App Info -->
     <div class="flex items-center space-x-4">
         <div class="p-4 bg-libre-green rounded-xl">
-            <img alt="LibreFolio" class="w-10 h-10" src="/logo.png"/>
+            <img alt="WealthNest" class="w-10 h-10" src="/logo.png"/>
         </div>
         <div>
-            <h3 class="text-xl font-bold text-gray-800" data-testid="about-app-name">LibreFolio</h3>
+            <h3 class="text-xl font-bold text-gray-800" data-testid="about-app-name">WealthNest</h3>
             <p class="text-gray-500" data-testid="about-version">{$_('settings.version')} {systemInfo?.app_version ?? '...'}</p>
         </div>
     </div>

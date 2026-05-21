@@ -15,7 +15,7 @@
     let mounted = false;
 
     // Key for localStorage
-    const STORAGE_KEY = 'librefolio-theme';
+    const STORAGE_KEY = 'wealthnest-theme';
 
     function getSystemTheme(): 'light' | 'dark' {
         if (typeof window === 'undefined') return 'light';

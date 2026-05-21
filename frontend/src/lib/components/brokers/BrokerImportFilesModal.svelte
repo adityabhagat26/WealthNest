@@ -11,6 +11,7 @@
 <script lang="ts">
     import {_} from '$lib/i18n';
     import {axiosInstance, zodiosApi} from '$lib/api';
+    import {autoImportBrimFile} from '$lib/utils/brimImport';
     import {ExternalLink, FileUp, RefreshCw, X} from 'lucide-svelte';
     import {fade} from 'svelte/transition';
     import ErrorBanner from '$lib/components/ui/ErrorBanner.svelte';
@@ -30,9 +31,11 @@
         brokerName: string;
         /** Called when modal is closed */
         onClose: () => void;
+        /** Called after files are imported */
+        onImported?: () => void | Promise<void>;
     }
 
-    let {open, brokerId, brokerName, onClose}: Props = $props();
+    let {open, brokerId, brokerName, onClose, onImported}: Props = $props();
 
     // State
     let files = $state<BrimFile[]>([]);
@@ -40,6 +43,7 @@
     let error = $state<string | null>(null);
     let uploading = $state(false);
     let showUploader = $state(false);
+    let successMessage = $state<string | null>(null);
 
     // Pending files tracking for close confirmation
     let pendingFiles = $state<globalThis.File[]>([]);
@@ -58,6 +62,7 @@
             showUploader = false;
             pendingFiles = [];
             error = null;
+            successMessage = null;
         }
     });
 
@@ -87,18 +92,33 @@
 
         uploading = true;
         error = null;
+        successMessage = null;
 
         try {
+            const importSummaries: string[] = [];
+
             for (const file of uploadFiles) {
                 const formData = new FormData();
                 formData.append('file', file);
                 // Use axios directly - Zodios doesn't handle FormData correctly
-                await axiosInstance.post(`/api/v1/brokers/import/upload?broker_id=${brokerId}`, formData);
+                const uploadResponse = await axiosInstance.post(`/api/v1/brokers/import/upload?broker_id=${brokerId}`, formData);
+                const fileId = uploadResponse.data?.file_id as string | undefined;
+
+                if (fileId) {
+                    const importResult = await autoImportBrimFile(fileId, brokerId);
+                    importSummaries.push(`${file.name}: ${importResult.importedCount} transactions, ${importResult.createdAssets} assets`);
+                }
             }
 
             showUploader = false;
             pendingFiles = [];
             await loadFiles();
+            if (onImported) {
+                await onImported();
+            }
+            if (importSummaries.length > 0) {
+                successMessage = `Import completed. ${importSummaries.join(' | ')}`;
+            }
         } catch (e) {
             console.error('Upload failed:', e);
             error = e instanceof Error ? e.message : $_('uploads.uploadFailed');
@@ -149,6 +169,7 @@
         }
         showFileEdit = false;
         editingFile = null;
+        editingFileIndex = -1;
     }
 
     function tryClose() {
@@ -227,8 +248,16 @@
                 </div>
             {/if}
 
-            <!-- Error Message -->
+            <!-- Messages -->
             <ErrorBanner message={error} on:dismiss={() => error = ''} />
+            {#if successMessage}
+                <div class="success-banner" role="status">
+                    <span>{successMessage}</span>
+                    <button type="button" class="dismiss-btn" onclick={() => successMessage = null}>
+                        <X size={14}/>
+                    </button>
+                </div>
+            {/if}
 
             <!-- Content -->
             <div class="modal-body">
@@ -414,6 +443,43 @@
         justify-content: center;
         padding: 3rem;
         text-align: center;
+    }
+
+    .success-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 0 1.5rem;
+        padding: 0.75rem 0.875rem;
+        border: 1px solid #bbf7d0;
+        border-radius: 0.75rem;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 0.875rem;
+    }
+
+    :global(.dark) .success-banner {
+        background: rgba(22, 101, 52, 0.2);
+        border-color: rgba(134, 239, 172, 0.35);
+        color: #bbf7d0;
+    }
+
+    .dismiss-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem;
+        border: none;
+        background: transparent;
+        color: inherit;
+        border-radius: 999px;
+        cursor: pointer;
+        opacity: 0.7;
+    }
+
+    .dismiss-btn:hover {
+        opacity: 1;
     }
 
     .modal-footer {

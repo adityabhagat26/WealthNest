@@ -1,5 +1,5 @@
 """
-Settings schemas for LibreFolio.
+Settings schemas for WealthNest.
 
 Schemas for user settings and global settings management.
 """
@@ -129,7 +129,7 @@ GLOBAL_SETTINGS_DEFAULTS = {
         },
     # Display
     "default_currency": {
-        "value": "EUR",
+        "value": "INR",
         "type": "str",
         "description": "Default display currency for new users",
         },

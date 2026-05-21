@@ -100,9 +100,9 @@
                 on:click={toggleCollapsed}
                 title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-            <img alt="LibreFolio" class="h-8 w-auto flex-shrink-0" src="/logo.png"/>
+            <img alt="WealthNest" class="h-8 w-auto flex-shrink-0" src="/logo.png"/>
             {#if !collapsed}
-                <span class="text-xl font-bold tracking-wide whitespace-nowrap">LibreFolio</span>
+                <span class="text-xl font-bold tracking-wide whitespace-nowrap">WealthNest</span>
             {/if}
         </button>
         <!-- Mobile close button -->
@@ -258,7 +258,7 @@
 
         <!-- Version -->
         {#if !collapsed}
-            <div class="text-center text-white/40 text-xs pt-2" title="LibreFolio {APP_VERSION}">
+            <div class="text-center text-white/40 text-xs pt-2" title="WealthNest {APP_VERSION}">
                 {APP_VERSION}
             </div>
         {/if}

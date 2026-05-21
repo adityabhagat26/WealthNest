@@ -14,7 +14,7 @@ Log Levels:
   - debug: Shows summary + which constraints pass/fail (default)
   - verbose: Shows everything including how to fix issues
 
-Author: LibreFolio Contributors
+Author: WealthNest Contributors
 """
 
 import sys
@@ -72,7 +72,7 @@ def get_engine_for_check():
 
     Priority:
     1. ALEMBIC_DATABASE_URL (explicit override from dev.sh)
-    2. get_data_dir() based on LIBREFOLIO_TEST_MODE
+    2. get_data_dir() based on WEALTHNEST_TEST_MODE
     3. DATABASE_URL from environment
     4. DATABASE_URL from .env file
     5. Fallback to prod database path via get_data_dir()
@@ -84,7 +84,7 @@ def get_engine_for_check():
     database_url = os.environ.get("ALEMBIC_DATABASE_URL")
 
     if not database_url:
-        # Use get_data_dir() which respects LIBREFOLIO_TEST_MODE
+        # Use get_data_dir() which respects WEALTHNEST_TEST_MODE
         data_dir = get_data_dir()
         db_path = data_dir / "sqlite" / "app.db"
         database_url = f"sqlite:///{db_path}"

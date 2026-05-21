@@ -143,7 +143,7 @@
     $: hasDuplicateCurrencies = new Set(initialBalances.map(b => b.code)).size !== initialBalances.length;
 
     // Get user's default currency
-    $: defaultCurrency = $userSettings?.base_currency ?? 'EUR';
+    $: defaultCurrency = $userSettings?.base_currency ?? 'INR';
 
     // Image picker state (uses ImagePickerWrapper)
     let showImagePicker = false;
@@ -162,7 +162,7 @@
         if (usedCodes.has(defaultCurrency)) {
             // Find a currency not already used
             const available = currencyOptions.find(c => !usedCodes.has(c.value));
-            newCode = available?.value ?? 'EUR';
+            newCode = available?.value ?? 'INR';
         }
 
         initialBalances = [...initialBalances, {

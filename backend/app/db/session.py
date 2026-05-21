@@ -15,7 +15,7 @@ from backend.app.config import get_settings
 
 
 # NOTE: settings is loaded lazily in get_sync_engine() and get_async_engine()
-# to allow test setup to configure LIBREFOLIO_TEST_MODE before first use.
+# to allow test setup to configure WEALTHNEST_TEST_MODE before first use.
 # Do NOT load settings at module level!
 
 

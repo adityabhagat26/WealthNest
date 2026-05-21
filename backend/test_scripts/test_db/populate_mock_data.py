@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database mock data population script for LibreFolio.
+Database mock data population script for WealthNest.
 
 This script populates the database with comprehensive MOCK data
 for testing purposes (especially useful for frontend development).
@@ -1145,7 +1145,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("LibreFolio Database - Mock Data Population")
+    print("WealthNest Database - Mock Data Population")
     print("=" * 60)
     print("\n⚠️  Populating database with MOCK DATA for testing...")
     print("This data is for development/testing purposes only.\n")

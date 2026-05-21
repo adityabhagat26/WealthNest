@@ -1,5 +1,5 @@
 /**
- * Zodios API Client for LibreFolio
+ * Zodios API Client for WealthNest
  *
  * Type-safe API client built on Zodios (which uses Axios internally).
  *
@@ -32,7 +32,7 @@ const DEFAULT_TIMEOUT = 30000;
 // Get current language from localStorage or default to 'en'
 function getCurrentLanguage(): string {
     if (!browser) return 'en';
-    return localStorage.getItem('librefolio-locale') || 'en';
+    return localStorage.getItem('wealthnest-locale') || 'en';
 }
 
 // =============================================================================
@@ -70,7 +70,7 @@ function serializeParams(params: Record<string, unknown>): string {
 }
 
 /**
- * Custom Axios instance with LibreFolio configuration.
+ * Custom Axios instance with WealthNest configuration.
  * This is passed to Zodios to use instead of creating its own.
  *
  * Note: No baseURL needed because endpoints already include full path (e.g., /api/v1/auth/login)

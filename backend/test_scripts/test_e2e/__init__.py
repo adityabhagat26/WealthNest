@@ -1,1 +1,1 @@
-# E2E tests for LibreFolio
+# E2E tests for WealthNest

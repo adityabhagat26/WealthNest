@@ -1,5 +1,5 @@
 """
-Transaction Service for LibreFolio.
+Transaction Service for WealthNest.
 
 Centralizes all transaction business logic:
 - CRUD operations with validation

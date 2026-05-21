@@ -24,7 +24,7 @@ export interface GlobalSettings {
 
 const defaultGlobalSettings: GlobalSettings = {
     default_language: 'en',
-    default_currency: 'EUR',
+    default_currency: 'INR',
     default_theme: 'auto',
     session_ttl_hours: 24,
     auto_sync_fx_rates: false,

@@ -50,7 +50,7 @@ class PreviewCache:
 
     NOTE: This cache is per-process. With multiple uvicorn workers,
     each worker maintains its own independent cache. For a single-worker
-    deployment (recommended for LibreFolio), this is optimal.
+    deployment (recommended for WealthNest), this is optimal.
     """
 
     TTL = 3600  # 1 hour

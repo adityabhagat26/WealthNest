@@ -1,6 +1,6 @@
-# LibreFolio Frontend
+# WealthNest Frontend
 
-SvelteKit frontend for LibreFolio - self-hosted portfolio tracker.
+SvelteKit frontend for WealthNest - self-hosted portfolio tracker.
 
 ## Tech Stack
 

@@ -1,5 +1,5 @@
 """
-Geographic area utilities for LibreFolio.
+Geographic area utilities for WealthNest.
 
 Provides functions to normalize country codes to ISO-3166-A3 format.
 Weight validation and quantization is handled by BaseDistribution in schemas/assets.py.

@@ -6,7 +6,7 @@
     let isOpen = false;
     let menuRef: HTMLDivElement;
 
-    const githubIssuesUrl = 'https://github.com/Alfystar/LibreFolio/issues';
+    const githubIssuesUrl = 'https://github.com/Alfystar/WealthNest/issues';
     const docsUrl = '/mkdocs/';
     const faqUrl = '/mkdocs/faq/'; // Link to MkDocs FAQ
 

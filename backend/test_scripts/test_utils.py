@@ -1,5 +1,5 @@
 """
-LibreFolio Test Utilities Library
+WealthNest Test Utilities Library
 
 Common utilities for all test scripts to avoid code duplication.
 Provides standardized output formatting, test helpers, and common functions.

@@ -13,7 +13,7 @@ import {DEFAULT_LOCALE, LOCALE_FLAGS, LOCALE_NAMES, saveLocalePreference, SUPPOR
  */
 function getStoredLocale(): SupportedLocale {
     if (!browser) return DEFAULT_LOCALE;
-    const stored = localStorage.getItem('librefolio-locale');
+    const stored = localStorage.getItem('wealthnest-locale');
     if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
         return stored as SupportedLocale;
     }
@@ -78,7 +78,7 @@ function createLanguageStore() {
             if (!browser) return;
 
             // Get from localStorage
-            const stored = localStorage.getItem('librefolio-locale');
+            const stored = localStorage.getItem('wealthnest-locale');
             if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
                 const lang = stored as SupportedLocale;
                 set(lang);

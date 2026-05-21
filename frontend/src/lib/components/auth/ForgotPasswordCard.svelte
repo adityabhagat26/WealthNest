@@ -13,8 +13,8 @@
     <!-- Header Section (Dark Green) -->
     <div class="bg-libre-green p-8 flex flex-col items-center justify-center space-y-2">
         <div class="flex items-center space-x-3 text-white">
-            <img alt="LibreFolio" class="h-10 w-auto" src="/logo.png"/>
-            <span class="text-2xl font-bold tracking-wide">LibreFolio</span>
+            <img alt="WealthNest" class="h-10 w-auto" src="/logo.png"/>
+            <span class="text-2xl font-bold tracking-wide">WealthNest</span>
         </div>
         <span class="text-white/80 text-sm">{$_('auth.passwordRecovery')}</span>
     </div>

@@ -1,5 +1,5 @@
 /**
- * i18n Configuration for LibreFolio
+ * i18n Configuration for WealthNest
  *
  * Supported languages: English, Italian, French, Spanish
  * Uses svelte-i18n for internationalization
@@ -59,7 +59,7 @@ function getInitialLocale(): SupportedLocale {
     if (!browser) return DEFAULT_LOCALE;
 
     // Try localStorage first
-    const stored = localStorage.getItem('librefolio-locale');
+    const stored = localStorage.getItem('wealthnest-locale');
     if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
         return stored as SupportedLocale;
     }
@@ -93,7 +93,7 @@ export function initI18n() {
  */
 export function saveLocalePreference(locale: SupportedLocale) {
     if (browser) {
-        localStorage.setItem('librefolio-locale', locale);
+        localStorage.setItem('wealthnest-locale', locale);
     }
 }
 

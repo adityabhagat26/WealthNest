@@ -19,7 +19,7 @@
     export let isOpen = false;
     export let type: 'DEPOSIT' | 'WITHDRAWAL' = 'DEPOSIT';
     export let brokerId: number;
-    export let initialCurrency: string = 'EUR';
+    export let initialCurrency: string = 'INR';
 
     // Form state
     let amount = 0;

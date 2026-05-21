@@ -1,5 +1,5 @@
 /**
- * LibreFolio Frontend Type Library
+ * WealthNest Frontend Type Library
  *
  * Centralized TypeScript types for all domain entities.
  * Types are derived from Zod schemas in generated.ts to stay in sync with backend.

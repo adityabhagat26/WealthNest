@@ -161,7 +161,7 @@ class BOEProvider(FXRateProvider):
             try:
                 # BOE requires a proper User-Agent header
                 headers = {
-                    "User-Agent": "Mozilla/5.0 (compatible; LibreFolio/1.0; +https://github.com/librefolio)"
+                    "User-Agent": "Mozilla/5.0 (compatible; WealthNest/1.0; +https://github.com/wealthnest)"
                     }
 
                 async with httpx.AsyncClient(

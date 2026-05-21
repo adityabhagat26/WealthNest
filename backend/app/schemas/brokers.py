@@ -1,5 +1,5 @@
 """
-Broker schemas for LibreFolio.
+Broker schemas for WealthNest.
 
 DTOs for Broker CRUD operations.
 These schemas provide strict validation for API input/output.

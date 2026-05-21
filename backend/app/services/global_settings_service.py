@@ -118,10 +118,10 @@ async def get_default_currency(session: AsyncSession) -> str:
     """
     Get default base currency for new users.
 
-    Default: "EUR"
+    Default: "INR"
     """
-    value = await get_setting_value(session, "default_currency", "EUR")
-    return str(value) if value else "EUR"
+    value = await get_setting_value(session, "default_currency", "INR")
+    return str(value) if value else "INR"
 
 
 # Synchronous fallback functions (use defaults, no DB access)

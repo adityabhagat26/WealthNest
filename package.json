@@ -1,7 +1,7 @@
 {
-	"name": "librefolio",
+	"name": "wealthnest",
 	"version": "0.0.1",
-	"description": "LibreFolio - Self-hosted financial portfolio tracker",
+	"description": "WealthNest - Self-hosted financial portfolio tracker",
 	"private": true,
 	"scripts": {
 		"install:all": "npm install && cd frontend && npm install",

@@ -29,7 +29,7 @@
         auto_sync_fx_rates: 'true',
         auto_sync_prices: 'true',
         price_sync_interval_hours: '6',
-        default_currency: 'EUR',
+        default_currency: 'INR',
         default_language: 'en',
     };
 
@@ -258,7 +258,7 @@
     function syncGlobalSettingsStore() {
         globalSettings.setDirect({
             default_language: editedValues['default_language'] || 'en',
-            default_currency: editedValues['default_currency'] || 'EUR',
+            default_currency: editedValues['default_currency'] || 'INR',
             default_theme: editedValues['default_theme'] || 'auto',
             session_ttl_hours: parseInt(editedValues['session_ttl_hours'] || '24', 10),
             auto_sync_fx_rates: editedValues['auto_sync_fx_rates'] === 'true',

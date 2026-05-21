@@ -1,5 +1,5 @@
 """
-Pydantic schemas for LibreFolio.
+Pydantic schemas for WealthNest.
 
 Used across multiple subsystems (DB, API, Services) to validate data structures
 and standardize data exchange between components.

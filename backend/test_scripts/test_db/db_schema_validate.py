@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database schema validation script for LibreFolio.
+Database schema validation script for WealthNest.
 
 Verifies:
 - All tables created correctly

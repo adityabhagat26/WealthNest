@@ -1,5 +1,5 @@
 /**
- * Debug logging utility for LibreFolio frontend.
+ * Debug logging utility for WealthNest frontend.
  *
  * Uses compile-time environment variable substitution.
  * When VITE_DEBUG is not set or false, the minifier will eliminate

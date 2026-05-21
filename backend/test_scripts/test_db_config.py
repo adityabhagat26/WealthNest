@@ -9,7 +9,7 @@ Data Structure:
     ├── prod/sqlite/app.db    # Production database
     └── test/sqlite/app.db    # Test database (isolated)
 
-The test database is automatically used when LIBREFOLIO_TEST_MODE=1.
+The test database is automatically used when WEALTHNEST_TEST_MODE=1.
 """
 
 import os
@@ -43,7 +43,7 @@ def setup_test_database():
     # Enable explicit test mode for the application BEFORE any app modules are imported.
     # This mirrors the --test flag behavior and ensures get_settings() will return
     # DATABASE_URL pointing at the test database.
-    os.environ["LIBREFOLIO_TEST_MODE"] = "1"
+    os.environ["WEALTHNEST_TEST_MODE"] = "1"
 
     return TEST_DB_PATH
 
@@ -63,7 +63,7 @@ def get_test_db_path() -> Path:
 
 def is_test_database_configured() -> bool:
     """Check if test database is configured (test mode is enabled)."""
-    return os.environ.get("LIBREFOLIO_TEST_MODE", "").lower() in ("1", "true", "yes")
+    return os.environ.get("WEALTHNEST_TEST_MODE", "").lower() in ("1", "true", "yes")
 
 
 def verify_test_database() -> tuple[bool, str]:
@@ -73,7 +73,7 @@ def verify_test_database() -> tuple[bool, str]:
     Returns:
         tuple: (is_test_db, database_url)
     """
-    # Import settings at call time so that LIBREFOLIO_TEST_MODE env var has effect
+    # Import settings at call time so that WEALTHNEST_TEST_MODE env var has effect
     settings = get_settings()
     db_url = settings.DATABASE_URL
 

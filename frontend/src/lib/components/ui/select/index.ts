@@ -1,7 +1,7 @@
 /**
  * Select Components Family
  *
- * Unified dropdown select components for LibreFolio.
+ * Unified dropdown select components for WealthNest.
  * All components use Svelte 5 runes and support snippet-based customization.
  */
 

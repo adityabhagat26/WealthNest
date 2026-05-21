@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-i18n Audit Tool for LibreFolio
+i18n Audit Tool for WealthNest
 
 This script analyzes translation files and generates a comparison table
 showing all translation keys across all languages, highlighting missing translations.
@@ -383,7 +383,7 @@ def export_markdown(
 
     # Build report parts
     parts = [
-        "# LibreFolio i18n Audit Report\n",
+        "# WealthNest i18n Audit Report\n",
         f"*Generated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M')}*\n",
         summary,
         missing_report,
@@ -492,7 +492,7 @@ def run_audit(format_type: str = "none", output: str | None = None) -> int:
         output_dir = Path.cwd()
 
     print("=" * 60)
-    print("  LibreFolio i18n Audit Tool")
+    print("  WealthNest i18n Audit Tool")
     print("=" * 60)
     print()
 
@@ -583,7 +583,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Audit LibreFolio i18n translations",
+        description="Audit WealthNest i18n translations",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

@@ -32,7 +32,7 @@
     let editModalOpen = false;
     let cashModalOpen = false;
     let cashModalType: 'DEPOSIT' | 'WITHDRAWAL' = 'DEPOSIT';
-    let cashModalCurrency = 'EUR';
+    let cashModalCurrency = 'INR';
     let importFilesModalOpen = false;
     let sharingModalOpen = false;
 
@@ -84,7 +84,7 @@
 
     function handleNewDeposit() {
         cashModalType = 'DEPOSIT';
-        cashModalCurrency = broker?.cash_balances?.[0]?.code ?? 'EUR';
+        cashModalCurrency = broker?.cash_balances?.[0]?.code ?? 'INR';
         cashModalOpen = true;
     }
 
@@ -505,6 +505,7 @@
             brokerId={broker.id}
             brokerName={broker.name}
             onClose={() => importFilesModalOpen = false}
+            onImported={handleUpdated}
     />
 
     <!-- Sharing Modal -->

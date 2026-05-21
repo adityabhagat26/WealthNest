@@ -1,28 +1,409 @@
 <script lang="ts">
+    import {onMount} from 'svelte';
     import {_} from '$lib/i18n';
-    import {BarChart3, Plus} from 'lucide-svelte';
+    import {zodiosApi} from '$lib/api';
+    import {portfolioImportVersion} from '$lib/stores/importRefresh';
+    import type {AssetInfo} from '$lib/types';
+    import {safeString} from '$lib/types';
+    import {BarChart3, Coins, RefreshCw, Search, Tags} from 'lucide-svelte';
+
+    let loading = true;
+    let error: string | null = null;
+    let assets: AssetInfo[] = [];
+    let search = '';
+    let lastSeenImportVersion = 0;
+
+    onMount(async () => {
+        await loadAssets();
+    });
+
+    $: if ($portfolioImportVersion > lastSeenImportVersion) {
+        lastSeenImportVersion = $portfolioImportVersion;
+        if (!loading) {
+            loadAssets();
+        }
+    }
+
+    async function loadAssets() {
+        loading = true;
+        error = null;
+
+        try {
+            assets = await zodiosApi.get_all_assets_api_v1_assets_all_get() as AssetInfo[];
+        } catch (e) {
+            console.error('Failed to load assets:', e);
+            error = 'Failed to load assets';
+        } finally {
+            loading = false;
+        }
+    }
+
+    function assetTypeLabel(asset: AssetInfo): string {
+        return safeString(asset.asset_type) || 'UNCLASSIFIED';
+    }
+
+    function primaryIdentifier(asset: AssetInfo): string {
+        return (
+            safeString(asset.identifier_ticker) ||
+            safeString(asset.identifier) ||
+            safeString(asset.identifier_isin) ||
+            safeString(asset.identifier_other) ||
+            '-'
+        );
+    }
+
+    $: filteredAssets = assets.filter((asset) => {
+        const needle = search.trim().toLowerCase();
+        if (!needle) return true;
+        return [
+            asset.display_name,
+            safeString(asset.identifier_ticker),
+            safeString(asset.identifier),
+            safeString(asset.asset_type),
+            safeString(asset.currency)
+        ].some((value) => value?.toLowerCase().includes(needle));
+    });
+    $: cryptoCount = filteredAssets.filter((asset) => asset.asset_type === 'CRYPTO').length;
+    $: providerCount = filteredAssets.filter((asset) => asset.has_provider).length;
 </script>
 
-<div class="space-y-6">
-    <!-- Header with action -->
-    <div class="flex items-center justify-between">
+<div class="assets-page">
+    <div class="page-header">
         <div>
-            <h2 class="text-lg font-semibold text-gray-700">{$_('assets.title')}</h2>
-            <p class="text-gray-500 text-sm">{$_('assets.subtitle')}</p>
+            <h2>{$_['assets.title']}</h2>
+            <p>{$_['assets.subtitle']}</p>
         </div>
-        <button class="flex items-center space-x-2 px-4 py-2 bg-libre-green text-white rounded-lg hover:bg-libre-green/90 transition-all">
-            <Plus size={18}/>
-            <span>{$_('assets.addAsset')}</span>
+        <button class="refresh-btn" on:click={loadAssets} disabled={loading}>
+            <RefreshCw size={16} class={loading ? 'spin' : ''}/>
+            <span>{$_['common.refresh'] || 'Refresh'}</span>
         </button>
     </div>
 
-    <!-- Placeholder -->
-    <div class="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <BarChart3 class="text-green-600" size={32}/>
+    <div class="toolbar">
+        <label class="search-box">
+            <Search size={16}/>
+            <input bind:value={search} placeholder="Search assets, tickers, or currency"/>
+        </label>
+        <div class="toolbar-chips">
+            <div class="count-chip">{filteredAssets.length} assets</div>
+            <div class="count-chip subtle"><Coins size={14}/> {cryptoCount} crypto</div>
+            <div class="count-chip subtle">{providerCount} with provider</div>
         </div>
-        <h3 class="text-lg font-semibold text-gray-700 mb-2">{$_('common.comingSoon')}</h3>
-        <p class="text-gray-500">{$_('assets.placeholderMessage')}</p>
     </div>
+
+    {#if error}
+        <div class="state-banner error">{error}</div>
+    {/if}
+
+    {#if loading}
+        <div class="state-card">
+            <RefreshCw size={22} class="spin"/>
+            <span>{$_['common.loading']}</span>
+        </div>
+    {:else if filteredAssets.length === 0}
+        <div class="state-card empty">
+            <BarChart3 size={28}/>
+            <div>
+                <h3>No assets found</h3>
+                <p>Imported assets will appear here after a broker report is parsed and saved.</p>
+            </div>
+        </div>
+    {:else}
+        <div class="asset-grid">
+            {#each filteredAssets as asset}
+                <article class="asset-card">
+                    <div class="asset-card-top">
+                        <div class="asset-icon">
+                            {#if safeString(asset.icon_url)}
+                                <img src={safeString(asset.icon_url) || undefined} alt={asset.display_name}/>
+                            {:else}
+                                <span>{asset.display_name.slice(0, 1).toUpperCase()}</span>
+                            {/if}
+                        </div>
+                        <div class="asset-heading">
+                            <h3>{asset.display_name}</h3>
+                            <p>{assetTypeLabel(asset)}</p>
+                        </div>
+                    </div>
+
+                    <div class="asset-tags">
+                        <span class="asset-tag">{primaryIdentifier(asset)}</span>
+                        <span class="asset-tag muted">{asset.currency}</span>
+                        {#if asset.asset_type === 'CRYPTO'}
+                            <span class="asset-tag accent">Imported Crypto</span>
+                        {/if}
+                    </div>
+
+                    <div class="asset-meta">
+                        <div>
+                            <span class="meta-label"><Tags size={14}/> Identifier</span>
+                            <strong>{primaryIdentifier(asset)}</strong>
+                        </div>
+                        <div>
+                            <span class="meta-label">Currency</span>
+                            <strong>{asset.currency}</strong>
+                        </div>
+                        <div>
+                            <span class="meta-label">Provider</span>
+                            <strong>{asset.has_provider ? 'Assigned' : 'Not assigned'}</strong>
+                        </div>
+                        <div>
+                            <span class="meta-label">Metadata</span>
+                            <strong>{asset.has_metadata ? 'Available' : 'None'}</strong>
+                        </div>
+                    </div>
+                </article>
+            {/each}
+        </div>
+    {/if}
 </div>
 
+<style>
+    .assets-page {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .page-header,
+    .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .page-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #e5e7eb;
+    }
+
+    .page-header p {
+        margin: 0.35rem 0 0;
+        color: #94a3b8;
+    }
+
+    .refresh-btn,
+    .count-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 999px;
+        padding: 0.7rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.55);
+        color: #e2e8f0;
+    }
+
+    .toolbar-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .count-chip.subtle {
+        background: rgba(15, 23, 42, 0.76);
+        border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    .search-box {
+        min-width: min(100%, 420px);
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.85rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(15, 23, 42, 0.76);
+        color: #94a3b8;
+    }
+
+    .search-box input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: #f8fafc;
+        outline: none;
+    }
+
+    .search-box input::placeholder {
+        color: #94a3b8;
+    }
+
+    .asset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0.9rem;
+    }
+
+    .asset-card,
+    .state-banner,
+    .state-card {
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(15, 23, 42, 0.76);
+    }
+
+    .asset-card {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .asset-card-top {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+    }
+
+    .asset-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.9rem;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(59, 130, 246, 0.22));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #f8fafc;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .asset-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .asset-heading h3,
+    .state-card h3,
+    .state-card p {
+        margin: 0;
+    }
+
+    .asset-heading h3 {
+        color: #f8fafc;
+        font-size: 1rem;
+    }
+
+    .asset-heading p {
+        margin: 0.3rem 0 0;
+        color: #38bdf8;
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .asset-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    .asset-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        padding: 0.4rem 0.65rem;
+        border-radius: 999px;
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        color: #e2e8f0;
+        font-size: 0.76rem;
+        overflow-wrap: anywhere;
+    }
+
+    .asset-tag.muted {
+        color: #cbd5e1;
+    }
+
+    .asset-tag.accent {
+        color: #bfdbfe;
+        background: rgba(30, 64, 175, 0.25);
+        border-color: rgba(96, 165, 250, 0.25);
+    }
+
+    .asset-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .asset-meta > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 0;
+    }
+
+    .meta-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: #94a3b8;
+        font-size: 0.78rem;
+    }
+
+    .asset-meta strong {
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        overflow-wrap: anywhere;
+    }
+
+    .state-banner.error {
+        padding: 0.85rem 1rem;
+        color: #fecaca;
+        background: rgba(127, 29, 29, 0.38);
+        border-color: rgba(248, 113, 113, 0.25);
+    }
+
+    .state-card {
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.85rem;
+        color: #cbd5e1;
+        text-align: center;
+    }
+
+    .state-card.empty {
+        flex-direction: column;
+    }
+
+    .spin {
+        animation: spin 0.9s linear infinite;
+    }
+
+    @media (max-width: 640px) {
+        .assets-page {
+            padding: 1rem;
+        }
+
+        .asset-grid,
+        .asset-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .toolbar-chips {
+            width: 100%;
+        }
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>

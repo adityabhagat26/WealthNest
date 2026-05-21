@@ -1,5 +1,5 @@
 """
-Broker API endpoints for LibreFolio.
+Broker API endpoints for WealthNest.
 
 Provides RESTful endpoints for broker management:
 - POST /brokers: Create brokers (with optional initial deposits)

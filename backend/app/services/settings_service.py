@@ -1,5 +1,5 @@
 """
-Settings service layer for LibreFolio.
+Settings service layer for WealthNest.
 
 Handles user settings and global settings operations.
 """
@@ -58,7 +58,7 @@ async def get_or_create_user_settings(user_id: int, session: AsyncSession) -> Us
     new_settings = UserSettings(
         user_id=user_id,
         language="en",
-        base_currency="EUR",
+        base_currency="INR",
         theme="light",
         nominee_enabled=False,
         nominee_threshold_days=30,
@@ -104,7 +104,7 @@ async def update_user_settings(
         settings = UserSettings(
             user_id=user_id,
             language=updates.language or "en",
-            base_currency=updates.base_currency or "EUR",
+            base_currency=updates.base_currency or "INR",
             theme=updates.theme or "light",
             avatar_url=updates.avatar_url,
             nominee_email=updates.nominee_email,

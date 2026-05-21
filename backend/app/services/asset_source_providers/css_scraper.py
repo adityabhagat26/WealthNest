@@ -110,7 +110,7 @@ class CSSScraperProvider(AssetSourceProvider):
         currency = provider_params["currency"]
         decimal_format = provider_params.get("decimal_format", "us")
         timeout = provider_params.get("timeout", 30)
-        user_agent = provider_params.get("user_agent", "LibreFolio/1.0")
+        user_agent = provider_params.get("user_agent", "WealthNest/1.0")
 
         try:
             # Build headers: start with defaults, then merge custom headers from params

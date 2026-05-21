@@ -1,5 +1,5 @@
 """
-Transaction API endpoints for LibreFolio.
+Transaction API endpoints for WealthNest.
 
 Provides RESTful endpoints for transaction management:
 - POST /transactions: Bulk create transactions

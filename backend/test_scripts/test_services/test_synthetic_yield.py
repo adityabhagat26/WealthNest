@@ -18,7 +18,7 @@ import pytest
 from backend.app.db import TransactionType
 
 # Force test mode BEFORE any other imports
-os.environ["LIBREFOLIO_TEST_MODE"] = "1"
+os.environ["WEALTHNEST_TEST_MODE"] = "1"
 
 from backend.app.services.asset_source_providers.scheduled_investment import (
     ScheduledInvestmentProvider,

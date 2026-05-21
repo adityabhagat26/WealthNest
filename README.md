@@ -1,10 +1,10 @@
-# LibreFolio
+# WealthNest
 
-**LibreFolio** is a self-hosted financial portfolio tracker for managing investments, cash accounts, and loans across multiple brokers.
+**WealthNest** is a self-hosted financial portfolio tracker for managing investments, cash accounts, and loans across multiple brokers.
 
 ## 📚 Documentation
 
-The full documentation is available at: **[https://alfystar.github.io/LibreFolio/](https://alfystar.github.io/LibreFolio/)**
+The full documentation is available at: **[https://alfystar.github.io/WealthNest/](https://alfystar.github.io/WealthNest/)**
 
 It includes:
 - 🚀 **Getting Started**: Installation and setup guides.
@@ -41,8 +41,8 @@ It includes:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Alfystar/LibreFolio.git
-cd LibreFolio
+git clone https://github.com/Alfystar/WealthNest.git
+cd WealthNest
 ```
 
 2. Install all dependencies:
@@ -86,7 +86,7 @@ The `./dev.sh` script is your main tool for development:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the **[Developer Manual](https://alfystar.github.io/LibreFolio/developer/)** before starting.
+Contributions are welcome! Please read the **[Developer Manual](https://alfystar.github.io/WealthNest/developer/)** before starting.
 
 ### For New Contributors
 
@@ -99,7 +99,7 @@ Contributions are welcome! Please read the **[Developer Manual](https://alfystar
 
 ## 📄 License
 
-LibreFolio is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0).
+WealthNest is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0).
 
 This means:
 - ✅ You can use, modify, and distribute this software freely
@@ -109,4 +109,4 @@ This means:
 
 See the [LICENSE](LICENSE) file for the full license text.
 
-**GitHub Repository**: [https://github.com/Alfystar/LibreFolio](https://github.com/Alfystar/LibreFolio)
+**GitHub Repository**: [https://github.com/Alfystar/WealthNest](https://github.com/Alfystar/WealthNest)

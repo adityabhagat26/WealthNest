@@ -1,5 +1,5 @@
 """
-Decimal precision utilities for LibreFolio.
+Decimal precision utilities for WealthNest.
 
 Provides functions to work with database numeric precision and decimal truncation.
 All numeric columns in the database use NUMERIC(precision, scale) type.

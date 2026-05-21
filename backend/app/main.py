@@ -1,5 +1,5 @@
 """
-LibreFolio FastAPI application.
+WealthNest FastAPI application.
 Main entry point for the backend API.
 """
 
@@ -28,10 +28,10 @@ from backend.app.utils.version import get_git_version
 # Check for test mode via environment variable ONLY
 # NOTE: Do NOT check sys.argv here - it causes issues when this module is imported
 # by other scripts (like test_runner). The --test flag is handled by dev.py which
-# sets LIBREFOLIO_TEST_MODE env var before starting uvicorn.
-if os.environ.get("LIBREFOLIO_TEST_MODE", "").lower() in ("1", "true", "yes"):
+# sets WEALTHNEST_TEST_MODE env var before starting uvicorn.
+if os.environ.get("WEALTHNEST_TEST_MODE", "").lower() in ("1", "true", "yes"):
     set_test_mode(True)
-    print("[LibreFolio] 🧪 Test mode enabled (LIBREFOLIO_TEST_MODE env var)")
+    print("[WealthNest] 🧪 Test mode enabled (WEALTHNEST_TEST_MODE env var)")
 
 # Get settings after test mode is set
 settings = get_settings()
@@ -140,7 +140,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     # Startup
     git_version = get_git_version()
     logger.info(
-        "Starting LibreFolio",
+        "Starting WealthNest",
         version=git_version,
         database_url=settings.DATABASE_URL.split("///")[-1],  # Hide full path in logs
         test_mode=is_test_mode(),
@@ -168,7 +168,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     # Shutdown
     nominee_stop_event.set()
     await nominee_task
-    logger.info("Shutting down LibreFolio")
+    logger.info("Shutting down WealthNest")
 
 
 async def _initialize_global_settings():
@@ -227,8 +227,8 @@ def render_docs_not_built() -> HTMLResponse:
     return HTMLResponse(
         """<html><body>
         <h1>Documentation not generated</h1>
-        <p>To build the <b>MkDocs</b> site, change into the <b>LibreFolio</b> installation directory and run:</p>
-        <pre><code>cd `/path/to/LibreFolio`
+        <p>To build the <b>MkDocs</b> site, change into the <b>WealthNest</b> installation directory and run:</p>
+        <pre><code>cd `/path/to/WealthNest`
 ./dev.sh info:mk build</code></pre>
         <p>If you are using <b>Docker</b> (coming soon), open a shell in the backend container and run the same command:</p>
         <pre><code>docker compose exec backend /bin/bash

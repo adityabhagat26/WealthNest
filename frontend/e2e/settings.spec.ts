@@ -212,7 +212,7 @@ test.describe('Settings', () => {
 
         test('shows app name and version', async ({page}) => {
             await expect(page.getByTestId('about-app-name')).toBeVisible();
-            await expect(page.getByTestId('about-app-name')).toContainText('LibreFolio');
+            await expect(page.getByTestId('about-app-name')).toContainText('WealthNest');
             await expect(page.getByTestId('about-version')).toBeVisible();
         });
     });

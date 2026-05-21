@@ -1,5 +1,5 @@
 """
-Transaction schemas for LibreFolio.
+Transaction schemas for WealthNest.
 
 DTOs for Transaction CRUD operations.
 These schemas provide strict validation for API input/output.

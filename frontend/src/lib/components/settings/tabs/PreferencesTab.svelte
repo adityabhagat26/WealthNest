@@ -37,7 +37,7 @@
     // Hardcoded fallback defaults (used only if global settings fail to load)
     const FALLBACK_DEFAULTS = {
         language: 'en',
-        default_currency: 'EUR',
+        default_currency: 'INR',
         theme: 'auto' as 'light' | 'dark' | 'auto'
     };
 
@@ -109,7 +109,7 @@
             debug.log('PreferencesTab', 'loadSettings response', response);
             originalValues = {
                 language: response.language || $currentLanguage,
-                default_currency: response.base_currency || 'EUR',
+                default_currency: response.base_currency || 'INR',
                 theme: response.theme || getStoredTheme()
             };
             editedValues = {...originalValues};
@@ -139,7 +139,7 @@
 
     function getStoredTheme(): 'light' | 'dark' | 'auto' {
         if (typeof localStorage === 'undefined') return 'auto';
-        const saved = localStorage.getItem('librefolio-theme');
+        const saved = localStorage.getItem('wealthnest-theme');
         if (saved === 'light' || saved === 'dark') return saved;
         return 'auto';
     }
@@ -202,7 +202,7 @@
                     theme: editedValues.theme
                 });
             } else if (field === 'theme') {
-                localStorage.setItem('librefolio-theme', editedValues.theme === 'auto' ? '' : editedValues.theme);
+                localStorage.setItem('wealthnest-theme', editedValues.theme === 'auto' ? '' : editedValues.theme);
                 document.documentElement.classList.remove('light', 'dark');
                 if (editedValues.theme !== 'auto') {
                     document.documentElement.classList.add(editedValues.theme);
@@ -261,7 +261,7 @@
             }
 
             if (themeModified) {
-                localStorage.setItem('librefolio-theme', editedValues.theme === 'auto' ? '' : editedValues.theme);
+                localStorage.setItem('wealthnest-theme', editedValues.theme === 'auto' ? '' : editedValues.theme);
                 document.documentElement.classList.remove('light', 'dark');
                 if (editedValues.theme !== 'auto') {
                     document.documentElement.classList.add(editedValues.theme);

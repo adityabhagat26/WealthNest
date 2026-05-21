@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# LibreFolio Development CLI Wrapper
+# WealthNest Development CLI Wrapper
 #
 # This is a thin wrapper around dev.py for backward compatibility.
 # All functionality is now in dev.py (Python).

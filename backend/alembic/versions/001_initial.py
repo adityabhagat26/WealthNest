@@ -58,7 +58,7 @@ def upgrade() -> None:
                (
                    id            INTEGER PRIMARY KEY,
                    user_id       INTEGER     NOT NULL UNIQUE,
-                   base_currency VARCHAR(3)  NOT NULL DEFAULT 'EUR',
+                   base_currency VARCHAR(3)  NOT NULL DEFAULT 'INR',
                    language      VARCHAR(5)  NOT NULL DEFAULT 'en',
                    theme         VARCHAR(20) NOT NULL DEFAULT 'light',
                    avatar_url    VARCHAR(500) DEFAULT NULL,

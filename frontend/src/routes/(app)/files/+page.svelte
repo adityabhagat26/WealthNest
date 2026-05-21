@@ -21,6 +21,7 @@
     import {t} from '$lib/i18n';
     import {axiosInstance, zodiosApi} from '$lib/api';
     import {uploadFile, formatBytes} from '$lib/utils/upload';
+    import {autoImportBrimFile} from '$lib/utils/brimImport';
     import {globalSettings} from '$lib/stores/globalSettings';
     import FileUploader from '$lib/components/ui/media/FileUploader.svelte';
     import {ImageEditModal, FileEditModal} from '$lib/components/ui/media';
@@ -119,6 +120,7 @@
     let brimFiles: BrimFile[] = [];
     let loading = true;
     let error: string | null = null;
+    let successMessage: string | null = null;
     let showUploader = false;
     let pendingStaticFiles: globalThis.File[] = [];  // Track files in static uploader
 
@@ -466,8 +468,10 @@
         if (!canConfirmBrimUpload()) return;
 
         try {
+            successMessage = null;
             // Collect broker IDs used in upload
             const usedBrokerIds = new Set<number>();
+            const importSummaries: string[] = [];
 
             for (let i = 0; i < pendingBrimFiles.length; i++) {
                 const file = pendingBrimFiles[i];
@@ -478,7 +482,13 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 // Use axios directly - Zodios doesn't handle FormData correctly
-                await axiosInstance.post(`/api/v1/brokers/import/upload?broker_id=${brokerId}`, formData);
+                const uploadResponse = await axiosInstance.post(`/api/v1/brokers/import/upload?broker_id=${brokerId}`, formData);
+                const fileId = uploadResponse.data?.file_id as string | undefined;
+
+                if (fileId) {
+                    const importResult = await autoImportBrimFile(fileId, brokerId);
+                    importSummaries.push(`${file.name}: ${importResult.importedCount} transactions, ${importResult.createdAssets} assets`);
+                }
             }
 
             // Add used broker IDs to selected filter so uploaded files are visible
@@ -489,6 +499,9 @@
             // Reset state
             closeBrimUploadModal();
             await loadFiles();
+            if (importSummaries.length > 0) {
+                successMessage = `Import completed. ${importSummaries.join(' | ')}`;
+            }
         } catch (e) {
             error = e instanceof Error ? e.message : 'Upload failed';
         }
@@ -595,7 +608,7 @@
 </script>
 
 <svelte:head>
-    <title>{$t('uploads.title')} - LibreFolio</title>
+    <title>{$t('uploads.title')} - WealthNest</title>
 </svelte:head>
 
 <div class="files-page" data-testid="files-page">
@@ -704,6 +717,9 @@
 
     <!-- Error message -->
     <ErrorBanner message={error} on:dismiss={() => error = null} />
+    {#if successMessage}
+        <div class="success-banner" role="status">{successMessage}</div>
+    {/if}
 
     <!-- Content -->
     <div class="content">
@@ -1067,6 +1083,23 @@
         text-align: center;
         padding: 3rem;
         color: #6b7280;
+    }
+
+    .success-banner {
+        margin-bottom: 1rem;
+        padding: 0.875rem 1rem;
+        border-radius: 0.75rem;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        color: #065f46;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    :global(.dark) .success-banner {
+        color: #d1fae5;
+        background: rgba(16, 185, 129, 0.18);
+        border-color: rgba(16, 185, 129, 0.35);
     }
 
     :global(.dark) .loading {

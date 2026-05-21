@@ -216,7 +216,7 @@ async def ensure_user_settings(session: AsyncSession, user_id: int) -> UserSetti
         settings_row = UserSettings(
             user_id=user_id,
             language="en",
-            base_currency="EUR",
+            base_currency="INR",
             theme="light",
             nominee_enabled=False,
             nominee_threshold_days=30,

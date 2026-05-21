@@ -1,5 +1,5 @@
 """
-Date and time utilities for LibreFolio.
+Date and time utilities for WealthNest.
 
 Provides timezone-aware datetime helpers and date manipulation functions.
 """

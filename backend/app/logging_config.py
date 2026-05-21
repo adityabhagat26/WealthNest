@@ -1,5 +1,5 @@
 """
-Logging configuration for LibreFolio backend.
+Logging configuration for WealthNest backend.
 
 Uses structlog for structured logging with:
 - Console output (development)
@@ -46,7 +46,7 @@ def _get_rotated_filename(default_name: str) -> str:
     Custom namer for rotated log files.
     Adds .gz extension for compression.
 
-    Example: librefolio.log.2025-11-28 -> librefolio.log.2025-11-28.gz
+    Example: wealthnest.log.2025-11-28 -> wealthnest.log.2025-11-28.gz
     """
     return default_name + ".gz"
 
@@ -102,7 +102,7 @@ def configure_logging(log_level: str = "INFO", enable_file_logging: bool = True)
     # File handler with weekly rotation (if enabled)
     if enable_file_logging:
         log_dir = get_log_directory()
-        log_file = log_dir / "librefolio.log"
+        log_file = log_dir / "wealthnest.log"
 
         # TimedRotatingFileHandler: rotate weekly (W0 = Monday), keep 52 backups (1 year)
         file_handler = logging.handlers.TimedRotatingFileHandler(

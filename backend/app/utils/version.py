@@ -1,5 +1,5 @@
 """
-Version utilities for LibreFolio.
+Version utilities for WealthNest.
 
 Gets version information from git tags.
 """

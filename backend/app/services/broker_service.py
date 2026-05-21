@@ -1,5 +1,5 @@
 """
-Broker Service for LibreFolio.
+Broker Service for WealthNest.
 
 Centralizes all broker business logic:
 - CRUD operations
@@ -48,6 +48,8 @@ from backend.app.schemas.brokers import (
     )
 from backend.app.schemas.common import Currency
 from backend.app.schemas.transactions import TXCreateItem
+from backend.app.services.fx import convert, RateNotFoundError
+from backend.app.services.settings_service import get_or_create_user_settings
 from backend.app.services.transaction_service import (
     TransactionService,
     BalanceValidationError,
@@ -419,6 +421,7 @@ class BrokerService:
         # Get current user's role and share on this broker
         user_role_value = None
         user_share_value = None
+        effective_user_id = user_id
         if not skip_access_check and check_user_id is not None:
             access_stmt = select(BrokerUserAccess).where(
                 and_(
@@ -431,6 +434,7 @@ class BrokerService:
             if user_access:
                 user_role_value = user_access.role.value
                 user_share_value = user_access.share_percentage
+                effective_user_id = check_user_id
         elif not skip_access_check:
             # user_id is the actual logged-in user
             access_stmt = select(BrokerUserAccess).where(
@@ -444,6 +448,12 @@ class BrokerService:
             if user_access:
                 user_role_value = user_access.role.value
                 user_share_value = user_access.share_percentage
+
+        total_value_base_currency = await self._compute_total_value_in_base_currency(
+            cash_balances=cash_balances,
+            holdings=holdings,
+            user_id=effective_user_id,
+        )
 
         return BRSummary(
             id=broker.id,
@@ -460,6 +470,7 @@ class BrokerService:
             updated_at=broker.updated_at,
             cash_balances=cash_balances,
             holdings=holdings,
+            total_value_base_currency=total_value_base_currency,
             user_role=user_role_value,
             user_share_percentage=user_share_value,
             )
@@ -475,6 +486,68 @@ class BrokerService:
         result = await self.session.execute(stmt)
         value = result.scalar_one_or_none()
         return value if value else None
+
+    async def _compute_total_value_in_base_currency(
+        self,
+        cash_balances: List[Currency],
+        holdings: List[BRAssetHolding],
+        user_id: int,
+    ) -> Optional[Currency]:
+        """
+        Aggregate broker cash + holdings into the user's base currency.
+
+        Returns None if nothing can be valued.
+        """
+        user_settings = await get_or_create_user_settings(user_id, self.session)
+        base_currency = user_settings.base_currency
+        total_value = Decimal("0")
+        has_valued_component = False
+        valuation_date = today_date()
+
+        for cash in cash_balances:
+            converted = await self._convert_currency_value(cash, base_currency, valuation_date)
+            if converted is None:
+                continue
+            total_value += converted.amount
+            has_valued_component = True
+
+        for holding in holdings:
+            if holding.current_value is None:
+                continue
+            converted = await self._convert_currency_value(
+                holding.current_value, base_currency, valuation_date
+            )
+            if converted is None:
+                continue
+            total_value += converted.amount
+            has_valued_component = True
+
+        if not has_valued_component:
+            return None
+
+        return Currency(code=base_currency, amount=total_value)
+
+    async def _convert_currency_value(
+        self, value: Currency, target_currency: str, valuation_date: date_type
+    ) -> Optional[Currency]:
+        """
+        Convert a Currency into target_currency using latest available FX rate.
+
+        Returns None if conversion is unavailable.
+        """
+        if value.code == target_currency:
+            return value
+
+        try:
+            converted = await convert(
+                self.session,
+                value,
+                target_currency,
+                valuation_date,
+            )
+            return converted
+        except RateNotFoundError:
+            return None
 
     # =========================================================================
     # UPDATE OPERATIONS

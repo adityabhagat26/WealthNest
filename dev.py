@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 """
-LibreFolio Development CLI
+WealthNest Development CLI
 
 Unified command-line interface for development tasks.
 Supports autocompletion via argcomplete.
@@ -158,7 +158,7 @@ def cmd_server(args):
     update_js_cache()
 
     mode_str = " (TEST MODE)" if test_mode else " (DEBUG MODE)" if debug_mode else ""
-    print(Colors.success(f"Starting LibreFolio API server{mode_str}..."))
+    print(Colors.success(f"Starting WealthNest API server{mode_str}..."))
     print(Colors.warning(f"Database: {db}"))
     print(Colors.warning(f"Port: {port}"))
     if test_mode:
@@ -189,9 +189,9 @@ def cmd_server(args):
 
     env = os.environ.copy()
     if test_mode:
-        env["LIBREFOLIO_TEST_MODE"] = "1"
+        env["WEALTHNEST_TEST_MODE"] = "1"
     if debug_mode:
-        env["LIBREFOLIO_LOG_LEVEL"] = "DEBUG"
+        env["WEALTHNEST_LOG_LEVEL"] = "DEBUG"
 
     return run_pipenv([
         "uvicorn",
@@ -290,7 +290,7 @@ def cmd_db_create_clean(args):
     env = os.environ.copy()
     env["DATABASE_URL"] = f"sqlite:///{full_path}"
     if test_mode:
-        env["LIBREFOLIO_TEST_MODE"] = "1"
+        env["WEALTHNEST_TEST_MODE"] = "1"
 
     result = run_pipenv(["alembic", "-c", "backend/alembic.ini", "upgrade", "head"], env=env)
 
@@ -394,7 +394,7 @@ def cmd_info_version(args):
     """Show application version from git tags."""
     from backend.app.utils.version import get_version_info
     version_info = get_version_info()
-    print(f"{Colors.CYAN}LibreFolio {version_info['version']}{Colors.NC}")
+    print(f"{Colors.CYAN}WealthNest {version_info['version']}{Colors.NC}")
     if version_info['is_dirty']:
         print(f"  {Colors.YELLOW}(uncommitted changes){Colors.NC}")
     if version_info['is_release']:
@@ -563,7 +563,7 @@ def cmd_shell(args):
 
 def cmd_install(args):
     """Install all dependencies."""
-    print_header("Installing LibreFolio Dependencies")
+    print_header("Installing WealthNest Dependencies")
     print()
 
     print(Colors.info("[1/4] Installing Python backend dependencies..."))
@@ -690,7 +690,7 @@ def update_js_cache():
 
 def main():
     parser = TreeParser(
-        description="LibreFolio Development CLI",
+        description="WealthNest Development CLI",
         formatter_class=format_help,
         epilog="""
 Commands by Category:
